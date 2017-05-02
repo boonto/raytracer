@@ -1,5 +1,5 @@
 //
-// Created by patrick on 21.04.17.
+// Created by Patrick Werner on 21.04.17.
 //
 
 #ifndef FAST_RAYTRACER_WINDOW_H

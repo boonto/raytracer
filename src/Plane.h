@@ -1,5 +1,5 @@
 //
-// Created by patrick on 21.04.17.
+// Created by Patrick Werner on 21.04.17.
 //
 
 #ifndef RAYTRACER_PLANE_H
@@ -9,9 +9,10 @@
 
 class Plane : public Primitive {
 public:
-    Plane(const glm::vec3 origin, const glm::vec3 normal) :
+    Plane(const glm::vec3 origin, const glm::vec3 normal, const float distance) :
             origin{std::move(origin)},
-            normal{std::move(normal)} {
+            normal{std::move(normal)},
+            distance(distance) {
     }
 
     std::tuple<bool, float> intersect(const Ray &ray, const float dist) const override;
@@ -23,6 +24,7 @@ public:
 private:
     glm::vec3 origin;
     glm::vec3 normal;
+    float distance;
 };
 
 #endif //RAYTRACER_PLANE_H

@@ -1,5 +1,5 @@
 //
-// Created by patrick on 27.04.17.
+// Created by Patrick Werner on 27.04.17.
 //
 
 #ifndef FAST_RAYTRACER_TRIANGLE_H

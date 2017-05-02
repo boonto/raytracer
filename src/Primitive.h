@@ -1,5 +1,5 @@
 //
-// Created by patrick on 01.05.17.
+// Created by Patrick Werner on 01.05.17.
 //
 
 #ifndef FAST_RAYTRACER_PRIMITIVE_H
@@ -21,6 +21,7 @@ public:
     virtual ~Primitive() {
     }
 
+    //TODO einzelne funktion?
     virtual std::tuple<bool, float> intersect(const Ray &ray, const float dist) const = 0; //TODO: schönerer retval?
 
     virtual std::tuple<glm::vec3, glm::vec3> getIntersectionVectors(const Ray &ray, const float dist) const = 0;

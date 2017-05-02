@@ -1,5 +1,5 @@
 //
-// Created by patrick on 30.04.17.
+// Created by Patrick Werner on 30.04.17.
 //
 
 #ifndef FAST_RAYTRACER_KDTREE_H
@@ -94,18 +94,21 @@ private:
         // median, not real median for even number of elements
         auto n = primitives.size() / 2;
         std::nth_element(primitives.begin(), primitives.begin()+n, primitives.end(), compare);
-        auto extremes = primitives[n]->getExtremes();
-        switch (axis) {
-            case Primitive::Axis::x: {
-                break;
-            }
-            case Primitive::Axis::y: {
-                break;
-            }
-            case Primitive::Axis::z: {
-                break;
-            }
-        }
+//        auto extremes = primitives[n]->getExtremes();
+//        switch (axis) {
+//            case Primitive::Axis::x: {
+//                std::cout << "x " << std::get<1>(extremes).x << "\n";
+//                break;
+//            }
+//            case Primitive::Axis::y: {
+//                std::cout << "y " << std::get<1>(extremes).y << "\n";
+//                break;
+//            }
+//            case Primitive::Axis::z: {
+//                std::cout << "z " << std::get<1>(extremes).z << "\n";
+//                break;
+//            }
+//        }
 
         auto leftHalf = std::vector<std::shared_ptr<Primitive>>{primitives.begin(), primitives.begin() + n};
         auto rightHalf = std::vector<std::shared_ptr<Primitive>>{primitives.begin() + n, primitives.end()};

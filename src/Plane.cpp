@@ -1,5 +1,5 @@
 //
-// Created by patrick on 21.04.17.
+// Created by Patrick Werner on 21.04.17.
 //
 
 #include <glm/glm.hpp>
@@ -27,8 +27,7 @@ std::tuple<glm::vec3, glm::vec3> Plane::getIntersectionVectors(const Ray &ray, c
 }
 
 std::tuple<glm::vec3, glm::vec3> Plane::getExtremes() const {
-    auto d = 15.0f; //TODO magic number in variable
-    auto minimum = origin - (glm::vec3{1.0f} - normal) * d;
-    auto maximum = origin + (glm::vec3{1.0f} - normal) * d;
+    auto minimum = origin - (glm::vec3{1.0f} - normal) * distance;
+    auto maximum = origin + (glm::vec3{1.0f} - normal) * distance;
     return std::make_tuple(minimum, maximum);
 }

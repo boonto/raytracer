@@ -15,6 +15,7 @@ public:
             max(vmax) {
     }
 
+    //TODO drüberschauen/optimieren
     bool intersect(const Ray &ray) const {
         float tmin = (min.x - ray.getOrigin().x) / ray.getDirection().x;
         float tmax = (max.x - ray.getOrigin().x) / ray.getDirection().x;

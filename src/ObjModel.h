@@ -1,5 +1,5 @@
 //
-// Created by patrick on 27.04.17.
+// Created by Patrick Werner on 27.04.17.
 //
 
 #ifndef FAST_RAYTRACER_OBJMODEL_H
@@ -12,6 +12,7 @@
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"
 #include "Mesh.h"
+#include "Triangle.h"
 
 class ObjModel : public Model {
 public:
@@ -56,7 +57,7 @@ private:
     }
 
     Mesh processMesh(aiMesh* mesh, const aiScene* scene) {
-        std::vector<Triangle> primitives;
+        std::vector<std::shared_ptr<Primitive>> primitives;
         for(unsigned int i = 0; i < mesh->mNumFaces; ++i) {
             std::array<glm::vec3, 3> vertices;
             auto face = mesh->mFaces[i];
@@ -65,7 +66,7 @@ private:
                 auto vertex = glm::vec3(aiVertex.x, aiVertex.y, aiVertex.z);
                 vertices[j] = vertex;
             }
-            primitives.emplace_back(vertices);
+            primitives.emplace_back(std::make_shared<Triangle>(vertices));
         }
 
         return Mesh(primitives);

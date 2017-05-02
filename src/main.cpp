@@ -1,3 +1,7 @@
+//
+// Created by Patrick Werner on 30.04.17.
+//
+
 #include <iostream>
 #include <vector>
 #include <tuple>
@@ -17,8 +21,8 @@
 //TODO: code verbessern, t/dist drübergehen
 
 const int MAX_DEPTH = 5;
-const int WIDTH = 100;
-const int HEIGHT = 100;
+const int WIDTH = 600;
+const int HEIGHT = 600;
 const auto MAX_VALUE = std::numeric_limits<float>::max();
 const auto EPSILON = std::numeric_limits<float>::epsilon();
 const glm::vec3 BACKGROUND_COLOR(0.0f, 0.0f, 0.0f);
@@ -26,6 +30,10 @@ const glm::vec3 BACKGROUND_COLOR(0.0f, 0.0f, 0.0f);
 int counter = 0;
 
 KdTree gtree{std::vector<std::shared_ptr<Primitive>>()};
+
+glm::vec3 shade(const Ray &ray, int depth, const std::vector<std::shared_ptr<Primitive>> &primitives,
+                const std::vector<std::shared_ptr<PointLight>> &lights, glm::vec3 &color,
+                std::tuple<bool, float> &intersection, const std::weak_ptr<Primitive> &m);
 
 //TODO: eigene Klasse
 glm::vec3 raytrace(const Ray &ray, int depth, const std::vector<std::shared_ptr<Primitive>> &primitives, const std::vector<std::shared_ptr<PointLight>> &lights) {
@@ -80,74 +88,83 @@ glm::vec3 raytrace(const Ray &ray, int depth, const std::vector<std::shared_ptr<
 
     // TODO eigene funktion
     if(!m.expired()) {
-        auto intersectionVectors = m.lock()->getIntersectionVectors(ray, std::get<1>(intersection));
-        auto intersectionPosition = std::get<0>(intersectionVectors);
-        auto intersectionNormal = std::get<1>(intersectionVectors);
+        color = shade(ray, depth, primitives, lights, color, intersection, m);
 
-        if (true) {
+    }
+
+    return color;
+}
+
+glm::vec3 shade(const Ray &ray, int depth, const std::vector<std::shared_ptr<Primitive>> &primitives,
+const std::vector<std::shared_ptr<PointLight>> &lights, glm::vec3 &color,
+std::tuple<bool, float> &intersection, const std::weak_ptr<Primitive> &m) {
+    auto intersectionVectors = m.lock()->getIntersectionVectors(ray, std::get<1>(intersection));
+    auto intersectionPosition = std::get<0>(intersectionVectors);
+    auto intersectionNormal = std::get<1>(intersectionVectors);
+
+    if (true) {
         //if (m.lock()->material.kDiffuse > 0.0f) {
-            auto lightAmt = glm::vec3{0.0f};
-            auto specularColor = glm::vec3{0.0f};
+        auto lightAmt = glm::vec3{0.0f};
+        auto specularColor = glm::vec3{0.0f};
 
-            auto shadowPointOrigin = (glm::dot(ray.getDirection(), intersectionNormal) < 0.0f) ?
-                                     intersectionPosition + intersectionNormal * EPSILON * 10000.0f :
-                                     intersectionPosition - intersectionNormal * EPSILON * 10000.0f;
+        auto shadowPointOrigin = (dot(ray.getDirection(), intersectionNormal) < 0.0f) ?
+                             intersectionPosition + intersectionNormal * EPSILON * 10000.0f :
+                             intersectionPosition - intersectionNormal * EPSILON * 10000.0f;
 
-            for (auto const &light : lights) {
-                auto lightDirection = light->origin - intersectionPosition;
-                auto lightDistance2 = glm::dot(lightDirection, lightDirection);
-                lightDirection = glm::normalize(lightDirection);
-                auto LdotN = std::max(glm::dot(lightDirection, intersectionNormal), 0.0f);
-                auto tNearShadow = MAX_VALUE;
+        for (auto const &light : lights) {
+            auto lightDirection = light->origin - intersectionPosition;
+            auto lightDistance2 = dot(lightDirection, lightDirection);
+            lightDirection = normalize(lightDirection);
+            auto LdotN = std::max(dot(lightDirection, intersectionNormal), 0.0f);
+            auto tNearShadow = MAX_VALUE;
 
-                bool inShadow = false;
-                // Blocker Cache
-                if (!light->blocker.expired()) {
-                    auto shadowIntersection = light->blocker.lock()->intersect(Ray{shadowPointOrigin, lightDirection}, tNearShadow);
+            //TODO schöner
+            bool inShadow = false;
+            // Blocker Cache
+            if (!light->blocker.expired()) {
+                auto shadowIntersection = light->blocker.lock()->intersect(Ray{shadowPointOrigin, lightDirection}, tNearShadow);
+                tNearShadow = std::get<1>(shadowIntersection);
+                inShadow = std::get<0>(shadowIntersection) && tNearShadow * tNearShadow <
+                                                              lightDistance2; //TODO: nötig? vll tNearShadow = sqrt(lightDistance)
+            }
+
+            if (!inShadow) {
+                for (auto const &model : primitives) {
+                    auto shadowIntersection = model->intersect(Ray{shadowPointOrigin, lightDirection},
+                                                               tNearShadow);
                     tNearShadow = std::get<1>(shadowIntersection);
                     inShadow = std::get<0>(shadowIntersection) && tNearShadow * tNearShadow <
                                                                   lightDistance2; //TODO: nötig? vll tNearShadow = sqrt(lightDistance)
-                }
-
-                if (!inShadow) {
-                    for (auto const &model : primitives) {
-                        auto shadowIntersection = model->intersect(Ray{shadowPointOrigin, lightDirection},
-                                                                   tNearShadow);
-                        tNearShadow = std::get<1>(shadowIntersection);
-                        inShadow = std::get<0>(shadowIntersection) && tNearShadow * tNearShadow <
-                                                                      lightDistance2; //TODO: nötig? vll tNearShadow = sqrt(lightDistance)
-                        if (inShadow) {
-                            light->blocker = m;
-                            break;
-                        }
+                    if (inShadow) {
+                        light->blocker = m;
+                        break;
                     }
                 }
-
-                lightAmt += (1 - inShadow) * light->intensity * LdotN;
-                auto reflectionDirection = glm::normalize(reflect(-lightDirection, intersectionNormal));
-                specularColor += (1 - inShadow) * powf(std::max(-glm::dot(reflectionDirection, ray.getDirection()), 0.0f), 100) * light->intensity;
-                //specularColor += powf(std::max(-glm::dot(reflectionDirection, ray.getDirection()), 0.0f), m->material.specPower) * light->intensity;
             }
-            color = lightAmt * glm::vec3{1.0f, 0.0f, 0.0f} * 1.0f + specularColor * 1.0f;
-            //color = lightAmt * m.lock()->material.diffuseColor * m.lock()->material.kDiffuse + specularColor * m.lock()->material.kSpecular;
+
+            lightAmt += (1 - inShadow) * light->intensity * LdotN;
+            auto reflectionDirection = normalize(reflect(-lightDirection, intersectionNormal));
+            specularColor += (1 - inShadow) * powf(std::max(-dot(reflectionDirection, ray.getDirection()), 0.0f), 100) * light->intensity;
+            //specularColor += powf(std::max(-glm::dot(reflectionDirection, ray.getDirection()), 0.0f), m->material.specPower) * light->intensity;
         }
-
-        // Reflection
-        if(false) {
-        //if (m.lock()->material.kReflective > 0.0f) {
-            auto reflectionDirection = glm::reflect(glm::normalize(intersectionPosition - ray.getOrigin()),
-                                                    intersectionNormal);
-            auto reflectionOrigin = (glm::dot(reflectionDirection, intersectionNormal) < 0) ?
-                                    intersectionPosition + intersectionNormal * EPSILON :
-                                    intersectionPosition - intersectionNormal * EPSILON; //TODO: nötig?
-            auto reflectionColor = raytrace(Ray{reflectionOrigin, reflectionDirection}, depth + 1, primitives, lights);
-
-            //reflectionColor *= m->material.kReflective;
-
-            color = reflectionColor;
-        }
+        color = lightAmt * glm::vec3{1.0f, 0.0f, 0.0f} * 1.0f + specularColor * 1.0f;
+        //color = lightAmt * m.lock()->material.diffuseColor * m.lock()->material.kDiffuse + specularColor * m.lock()->material.kSpecular;
     }
 
+    // Reflection
+    if(false) {
+        //if (m.lock()->material.kReflective > 0.0f) {
+        auto reflectionDirection = reflect(normalize(intersectionPosition - ray.getOrigin()),
+                                           intersectionNormal);
+        auto reflectionOrigin = (dot(reflectionDirection, intersectionNormal) < 0) ?
+                            intersectionPosition + intersectionNormal * EPSILON :
+                            intersectionPosition - intersectionNormal * EPSILON; //TODO: nötig?
+        auto reflectionColor = raytrace(Ray{reflectionOrigin, reflectionDirection}, depth + 1, primitives, lights);
+
+        //reflectionColor *= m->material.kReflective;
+
+        color = reflectionColor;
+    }
     return color;
 }
 

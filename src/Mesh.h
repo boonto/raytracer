@@ -1,19 +1,19 @@
 //
-// Created by patrick on 27.04.17.
+// Created by Patrick Werner on 27.04.17.
 //
 
 #ifndef FAST_RAYTRACER_MESH_H
 #define FAST_RAYTRACER_MESH_H
 
-#include "Triangle.h"
+#include "Primitive.h"
 
 class Mesh {
 public:
-    //TODO primitive!
-    std::vector<Triangle> triangles;
-
-    Mesh(const std::vector<Triangle> triangles) : triangles{std::move(triangles)} {
+    Mesh(const std::vector<std::shared_ptr<Primitive>> primitives) : primitives{std::move(primitives)} {
     }
+
+private:
+    std::vector<std::shared_ptr<Primitive>> primitives;
 };
 
 

@@ -1,5 +1,5 @@
 //
-// Created by patrick on 21.04.17.
+// Created by Patrick Werner on 21.04.17.
 //
 
 #ifndef FAST_RAYTRACER_SCENE_H
@@ -17,7 +17,6 @@ class Scene {
 public:
     Scene(const glm::ivec2 resolution) :
             camera{glm::vec3{-55.0f, 15.0f, 10.0f}, glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{0.0f, 0.0f, 0.0f}, std::move(resolution)},
-//            camera{glm::vec3{-15.0f, 5.0f, 0.0f}, glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{0.0f, 0.0f, 0.0f}, std::move(resolution)},
             primitives{},
             lights{} {
         auto greenMaterial = Material{glm::vec3{0.5f, 1.0f, 0.5f},
@@ -50,25 +49,25 @@ public:
                                      1.0f
         };
 
-//        auto plane = Plane{glm::vec3{0.0f, 0.0f, 0.0f}, glm::vec3{0.0f, 1.0f, 0.0f}};
-//        primitives.push_back(std::make_shared<Plane>(plane));
+        auto plane = Plane{glm::vec3{0.0f, 0.0f, 0.0f}, glm::vec3{0.0f, 1.0f, 0.0f}, 100.0f};
+        primitives.push_back(std::make_shared<Plane>(plane));
 
-//        auto sphere0 = Sphere{glm::vec3{-1.0f, 2.0f, 2.0f}, 1.0f};
-//        primitives.push_back(std::make_shared<Sphere>(sphere0));
-//
-//        auto sphere1 = Sphere{glm::vec3{0.0f, 2.0f, -2.0f}, 1.0f};
-//        primitives.push_back(std::make_shared<Sphere>(sphere1));
-//
-//        auto sphere2 = Sphere{glm::vec3{-3.0f, 2.0f, 2.0f}, 1.0f};
-//        primitives.push_back(std::make_shared<Sphere>(sphere2));
-//
-//        auto sphere3 = Sphere{glm::vec3{-4.0f, 2.0f, -2.0f}, 1.0f};
-//        primitives.push_back(std::make_shared<Sphere>(sphere3));
+        auto sphere0 = Sphere{glm::vec3{6.0f, 6.0f, 8.0f}, 5.0f};
+        primitives.push_back(std::make_shared<Sphere>(sphere0));
 
-        auto airplane = ObjModel{glm::vec3{0.0f, 2.0f, 0.0f}, redMaterial, std::string{"../cessna.obj"}};
-        for (auto triangle : airplane.meshes.front().triangles) {
-            primitives.push_back(std::make_shared<Triangle>(triangle));
-        }
+        auto sphere1 = Sphere{glm::vec3{0.0f, 6.0f, -8.0f}, 5.0f};
+        primitives.push_back(std::make_shared<Sphere>(sphere1));
+
+        auto sphere2 = Sphere{glm::vec3{-6.0f, 6.0f, 8.0f}, 5.0f};
+        primitives.push_back(std::make_shared<Sphere>(sphere2));
+
+        auto sphere3 = Sphere{glm::vec3{-12.0f, 6.0f, -8.0f}, 5.0f};
+        primitives.push_back(std::make_shared<Sphere>(sphere3));
+
+//        auto airplane = ObjModel{glm::vec3{0.0f, 2.0f, 0.0f}, redMaterial, std::string{"../cessna.obj"}};
+//        for (auto triangle : airplane.meshes.front().primitives) {
+//            primitives.push_back(triangle);
+//        }
 
 //        auto triangle0 = Triangle{glm::vec3{5.0f, 0.0f, 0.0f}, glm::vec3{5.0f, 5.0f, 5.0f}, glm::vec3{5.0f, 5.0f, -5.0f}};
 //        primitives.push_back(std::make_shared<Triangle>(triangle0));
