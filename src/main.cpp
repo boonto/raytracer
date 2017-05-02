@@ -19,6 +19,8 @@
 #include "KdTree.h"
 
 //TODO: code verbessern, t/dist drübergehen
+// pointer to const retvals? for each const&?
+// % anzeige im fenster
 
 const int MAX_DEPTH = 5;
 const int WIDTH = 600;
@@ -86,15 +88,14 @@ glm::vec3 raytrace(const Ray &ray, int depth, const std::vector<std::shared_ptr<
 //        counter++;
 //    }
 
-    // TODO eigene funktion
     if(!m.expired()) {
         color = shade(ray, depth, primitives, lights, color, intersection, m);
-
     }
 
     return color;
 }
 
+//TODO simplify
 glm::vec3 shade(const Ray &ray, int depth, const std::vector<std::shared_ptr<Primitive>> &primitives,
 const std::vector<std::shared_ptr<PointLight>> &lights, glm::vec3 &color,
 std::tuple<bool, float> &intersection, const std::weak_ptr<Primitive> &prim) {

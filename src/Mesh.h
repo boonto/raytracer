@@ -12,6 +12,10 @@ public:
     Mesh(const std::vector<std::shared_ptr<Primitive>> primitives) : primitives{std::move(primitives)} {
     }
 
+    //const retval?
+    std::vector<std::shared_ptr<Primitive>> getPrimitives() const {
+        return primitives;
+    }
 private:
     std::vector<std::shared_ptr<Primitive>> primitives;
 };

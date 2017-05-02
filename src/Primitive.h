@@ -34,7 +34,7 @@ public:
 
     virtual std::tuple<glm::vec3, glm::vec3> getExtremes() const = 0;
 
-    const std::shared_ptr<Material> getMaterial() const {
+    std::shared_ptr<Material> getMaterial() const {
         return material;
     }
 

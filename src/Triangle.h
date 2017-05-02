@@ -11,12 +11,25 @@
 
 class Triangle : public Primitive {
 public:
+
+    //TODO ctors aufräumen
     Triangle(const glm::vec3 p0, const glm::vec3 p1, const glm::vec3 p2) :
             Primitive{},
             vertices{p0, p1, p2} {
     }
 
+    Triangle(const glm::vec3 p0, const glm::vec3 p1, const glm::vec3 p2, const std::shared_ptr<Material> material) :
+            Primitive{material},
+            vertices{p0, p1, p2} {
+    }
+
     Triangle(const std::array<glm::vec3, 3> vertices) :
+            Primitive{},
+            vertices(std::move(vertices)) {
+    }
+
+    Triangle(const std::array<glm::vec3, 3> vertices, const std::shared_ptr<Material> material) :
+            Primitive{material},
             vertices(std::move(vertices)) {
     }
 

@@ -16,6 +16,13 @@ public:
             distance(distance) {
     }
 
+    Plane(const glm::vec3 origin, const glm::vec3 normal, const float distance, const std::shared_ptr<Material> material) :
+            Primitive{std::move(material)},
+            origin{std::move(origin)},
+            normal{std::move(normal)},
+            distance(distance) {
+    }
+
     std::tuple<bool, float> intersect(const Ray &ray, const float dist) const override;
 
     std::tuple<glm::vec3, glm::vec3> getIntersectionVectors(const Ray &ray, const float dist) const override;
