@@ -10,6 +10,7 @@
 class Plane : public Primitive {
 public:
     Plane(const glm::vec3 origin, const glm::vec3 normal, const float distance) :
+            Primitive{},
             origin{std::move(origin)},
             normal{std::move(normal)},
             distance(distance) {

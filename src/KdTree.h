@@ -17,6 +17,14 @@
 
 class KdTreeNode {
 public:
+    KdTreeNode(const std::shared_ptr<BoundingBox> bbox, const std::shared_ptr<KdTreeNode> leftChild,
+               const std::shared_ptr<KdTreeNode> rightChild, const std::shared_ptr<Primitive> data) :
+            bbox{std::move(bbox)},
+            leftChild{std::move(leftChild)},
+            rightChild{std::move(rightChild)},
+            data{std::move(data)} {
+    }
+
     std::shared_ptr<BoundingBox> bbox;
     std::shared_ptr<KdTreeNode> leftChild;
     std::shared_ptr<KdTreeNode> rightChild;
@@ -25,17 +33,15 @@ public:
 
 class KdTree {
 public:
-    KdTree(std::vector<std::shared_ptr<Primitive>> primitives) {
-        root = build(primitives, 0);
-
-        std::cout << "lol\n";
+    KdTree(std::vector<std::shared_ptr<Primitive>> primitives) :
+            root(build(primitives, 0)) {
     }
 
     KdTreeNode root;
 
 private:
     KdTreeNode build(std::vector<std::shared_ptr<Primitive>> primitives, int depth) {
-        auto node = KdTreeNode{};
+        auto node = KdTreeNode{nullptr, nullptr, nullptr, nullptr};
 
         if (primitives.size() == 1) {
             node.data = primitives[0];
@@ -44,24 +50,7 @@ private:
             return node;
         }
 
-        // create bounding box TODO eigene funktion/klasse, umdenken
-        auto minimum = glm::vec3{std::numeric_limits<float>::max()};
-        auto maximum = glm::vec3{std::numeric_limits<float>::min()};
-        for (auto primitive : primitives) {
-            auto extremes = primitive->getExtremes();
-
-            auto primMinimum = std::get<0>(extremes);
-            minimum.x = (primMinimum.x < minimum.x) ? primMinimum.x : minimum.x;
-            minimum.y = (primMinimum.y < minimum.y) ? primMinimum.y : minimum.y;
-            minimum.z = (primMinimum.z < minimum.z) ? primMinimum.z : minimum.z;
-
-            auto primMaximum = std::get<1>(extremes);
-            maximum.x = (primMaximum.x > maximum.x) ? primMaximum.x : maximum.x;
-            maximum.y = (primMaximum.y > maximum.y) ? primMaximum.y : maximum.y;
-            maximum.z = (primMaximum.z > maximum.z) ? primMaximum.z : maximum.z;
-        }
-
-        node.bbox = std::make_shared<BoundingBox>(BoundingBox{minimum, maximum});
+        node.bbox = std::make_shared<BoundingBox>(BoundingBox{primitives});
 
         auto axis = Primitive::Axis(depth % 3);
 

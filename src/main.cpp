@@ -33,7 +33,7 @@ KdTree gtree{std::vector<std::shared_ptr<Primitive>>()};
 
 glm::vec3 shade(const Ray &ray, int depth, const std::vector<std::shared_ptr<Primitive>> &primitives,
                 const std::vector<std::shared_ptr<PointLight>> &lights, glm::vec3 &color,
-                std::tuple<bool, float> &intersection, const std::weak_ptr<Primitive> &m);
+                std::tuple<bool, float> &intersection, const std::weak_ptr<Primitive> &prim);
 
 //TODO: eigene Klasse
 glm::vec3 raytrace(const Ray &ray, int depth, const std::vector<std::shared_ptr<Primitive>> &primitives, const std::vector<std::shared_ptr<PointLight>> &lights) {
@@ -97,13 +97,12 @@ glm::vec3 raytrace(const Ray &ray, int depth, const std::vector<std::shared_ptr<
 
 glm::vec3 shade(const Ray &ray, int depth, const std::vector<std::shared_ptr<Primitive>> &primitives,
 const std::vector<std::shared_ptr<PointLight>> &lights, glm::vec3 &color,
-std::tuple<bool, float> &intersection, const std::weak_ptr<Primitive> &m) {
-    auto intersectionVectors = m.lock()->getIntersectionVectors(ray, std::get<1>(intersection));
+std::tuple<bool, float> &intersection, const std::weak_ptr<Primitive> &prim) {
+    auto intersectionVectors = prim.lock()->getIntersectionVectors(ray, std::get<1>(intersection));
     auto intersectionPosition = std::get<0>(intersectionVectors);
     auto intersectionNormal = std::get<1>(intersectionVectors);
 
-    if (true) {
-        //if (m.lock()->material.kDiffuse > 0.0f) {
+    if (prim.lock()->getMaterial()->kDiffuse > 0.0f) {
         auto lightAmt = glm::vec3{0.0f};
         auto specularColor = glm::vec3{0.0f};
 
@@ -136,7 +135,7 @@ std::tuple<bool, float> &intersection, const std::weak_ptr<Primitive> &m) {
                     inShadow = std::get<0>(shadowIntersection) && tNearShadow * tNearShadow <
                                                                   lightDistance2; //TODO: nötig? vll tNearShadow = sqrt(lightDistance)
                     if (inShadow) {
-                        light->blocker = m;
+                        light->blocker = prim;
                         break;
                     }
                 }
@@ -144,16 +143,13 @@ std::tuple<bool, float> &intersection, const std::weak_ptr<Primitive> &m) {
 
             lightAmt += (1 - inShadow) * light->intensity * LdotN;
             auto reflectionDirection = normalize(reflect(-lightDirection, intersectionNormal));
-            specularColor += (1 - inShadow) * powf(std::max(-dot(reflectionDirection, ray.getDirection()), 0.0f), 100) * light->intensity;
-            //specularColor += powf(std::max(-glm::dot(reflectionDirection, ray.getDirection()), 0.0f), m->material.specPower) * light->intensity;
+            specularColor += powf(std::max(-glm::dot(reflectionDirection, ray.getDirection()), 0.0f), prim.lock()->getMaterial()->specPower) * light->intensity;
         }
-        color = lightAmt * glm::vec3{1.0f, 0.0f, 0.0f} * 1.0f + specularColor * 1.0f;
-        //color = lightAmt * m.lock()->material.diffuseColor * m.lock()->material.kDiffuse + specularColor * m.lock()->material.kSpecular;
+        color = lightAmt * prim.lock()->getMaterial()->diffuseColor * prim.lock()->getMaterial()->kDiffuse + specularColor * prim.lock()->getMaterial()->kSpecular;
     }
 
     // Reflection
-    if(false) {
-        //if (m.lock()->material.kReflective > 0.0f) {
+    if (prim.lock()->getMaterial()->kReflective > 0.0f) {
         auto reflectionDirection = reflect(normalize(intersectionPosition - ray.getOrigin()),
                                            intersectionNormal);
         auto reflectionOrigin = (dot(reflectionDirection, intersectionNormal) < 0) ?
@@ -161,7 +157,7 @@ std::tuple<bool, float> &intersection, const std::weak_ptr<Primitive> &m) {
                             intersectionPosition - intersectionNormal * EPSILON; //TODO: nötig?
         auto reflectionColor = raytrace(Ray{reflectionOrigin, reflectionDirection}, depth + 1, primitives, lights);
 
-        //reflectionColor *= m->material.kReflective;
+        reflectionColor *= prim.lock()->getMaterial()->kReflective;
 
         color = reflectionColor;
     }

@@ -9,9 +9,9 @@
 
 class Material {
 public:
-    Material(const glm::vec3 diffuseColor, const float kAmbient, const float kDiffuse,
-             const float kSpecular, const float kReflective, const float kTransparent,
-             const unsigned int specPower, const float refrIndex) :
+    Material(const glm::vec3 diffuseColor = glm::vec3{0.8f}, const float kAmbient = 0.0f, const float kDiffuse = 1.0f,
+             const float kSpecular = 0.0f, const float kReflective = 0.0f, const float kTransparent = 0.0f,
+             const unsigned int specPower = 0, const float refrIndex = 0.0f) :
             diffuseColor{std::move(diffuseColor)},
             kAmbient{kAmbient},
             kDiffuse{kDiffuse},

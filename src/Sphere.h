@@ -10,6 +10,7 @@
 class Sphere : public Primitive {
 public:
     Sphere(const glm::vec3 origin, const float radius) :
+            Primitive{},
             origin{std::move(origin)},
             radius{radius} {
     }

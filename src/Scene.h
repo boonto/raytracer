@@ -11,7 +11,6 @@
 #include "Plane.h"
 #include "Sphere.h"
 #include "PointLight.h"
-#include "ObjModel.h"
 
 class Scene {
 public:
@@ -29,25 +28,25 @@ public:
                                       1.2f
         };
 
-        auto reflectiveMaterial = Material{glm::vec3{1.0f, 0.0f, 0.0f},
-                                       0.0f,
-                                       0.0f,
-                                       0.0f,
-                                       1.0f,
-                                       0.0f,
-                                       90,
-                                       1.1f
-        };
+//        auto reflectiveMaterial = Material{glm::vec3{1.0f, 0.0f, 0.0f},
+//                                       0.0f,
+//                                       0.0f,
+//                                       0.0f,
+//                                       1.0f,
+//                                       0.0f,
+//                                       90,
+//                                       1.1f
+//        };
 
-        auto redMaterial = Material{glm::vec3{1.0f, 0.5f, 0.5f},
-                                     0.0f,
-                                     1.0f,
-                                     0.0f,
-                                     0.0f,
-                                     0.0f,
-                                     100,
-                                     1.0f
-        };
+//        auto redMaterial = Material{glm::vec3{1.0f, 0.5f, 0.5f},
+//                                     0.0f,
+//                                     1.0f,
+//                                     0.0f,
+//                                     0.0f,
+//                                     0.0f,
+//                                     100,
+//                                     1.0f
+//        };
 
         auto plane = Plane{glm::vec3{0.0f, 0.0f, 0.0f}, glm::vec3{0.0f, 1.0f, 0.0f}, 100.0f};
         primitives.push_back(std::make_shared<Plane>(plane));
@@ -63,6 +62,13 @@ public:
 
         auto sphere3 = Sphere{glm::vec3{-12.0f, 6.0f, -8.0f}, 5.0f};
         primitives.push_back(std::make_shared<Sphere>(sphere3));
+
+        auto sphere0Pointer = std::make_shared<Sphere>(sphere0);
+        auto sphere0Vector = std::vector<std::shared_ptr<Primitive>>{sphere0Pointer};
+        auto sphere0Mesh = Mesh{sphere0Vector};
+        auto sphere0MeshPointer = std::make_shared<Mesh>(sphere0Mesh);
+        auto sphere0MeshVector = std::vector<std::shared_ptr<Mesh>>{sphere0MeshPointer};
+        auto SphereModel = Model{glm::vec3{0.0f}, sphere0MeshVector};
 
 //        auto airplane = ObjModel{glm::vec3{0.0f, 2.0f, 0.0f}, redMaterial, std::string{"../cessna.obj"}};
 //        for (auto triangle : airplane.meshes.front().primitives) {

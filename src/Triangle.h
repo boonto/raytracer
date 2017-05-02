@@ -9,9 +9,10 @@
 #include <array>
 #include "Primitive.h"
 
-class Triangle : public Primitive{
+class Triangle : public Primitive {
 public:
     Triangle(const glm::vec3 p0, const glm::vec3 p1, const glm::vec3 p2) :
+            Primitive{},
             vertices{p0, p1, p2} {
     }
 

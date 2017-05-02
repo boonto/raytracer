@@ -10,9 +10,28 @@
 
 class BoundingBox {
 public:
-    BoundingBox(const glm::vec3 &vmin, const glm::vec3 &vmax) :
-            min(vmin),
-            max(vmax) {
+    BoundingBox(std::vector<std::shared_ptr<Primitive>> primitives) : 
+            min{std::move(glm::vec3{std::numeric_limits<float>::max()})},
+            max{std::move(glm::vec3{std::numeric_limits<float>::min()})} {
+        
+        for (auto primitive : primitives) {
+            auto extremes = primitive->getExtremes();
+
+            auto primMin = std::get<0>(extremes);
+            min.x = (primMin.x < min.x) ? primMin.x : min.x;
+            min.y = (primMin.y < min.y) ? primMin.y : min.y;
+            min.z = (primMin.z < min.z) ? primMin.z : min.z;
+
+            auto primMax = std::get<1>(extremes);
+            max.x = (primMax.x > max.x) ? primMax.x : max.x;
+            max.y = (primMax.y > max.y) ? primMax.y : max.y;
+            max.z = (primMax.z > max.z) ? primMax.z : max.z;
+        }
+    }
+    
+    BoundingBox(const glm::vec3 min, const glm::vec3 max) :
+            min{std::move(min)},
+            max{std::move(max)} {
     }
 
     //TODO drüberschauen/optimieren

@@ -6,8 +6,10 @@
 #define FAST_RAYTRACER_PRIMITIVE_H
 
 #include <tuple>
-#include <glm/vec3.hpp>
+#include <memory>
+#include "glm/vec3.hpp"
 #include "Ray.h"
+#include "Material.h"
 
 class Primitive {
 public:
@@ -16,6 +18,10 @@ public:
         y,
         z
     };
+
+    Primitive(const std::shared_ptr<Material> material = std::make_shared<Material>(Material{})) :
+            material{std::move(material)} {
+    }
 
     //TODO
     virtual ~Primitive() {
@@ -27,6 +33,13 @@ public:
     virtual std::tuple<glm::vec3, glm::vec3> getIntersectionVectors(const Ray &ray, const float dist) const = 0;
 
     virtual std::tuple<glm::vec3, glm::vec3> getExtremes() const = 0;
+
+    const std::shared_ptr<Material> getMaterial() const {
+        return material;
+    }
+
+private:
+    std::shared_ptr<Material> material;
 };
 
 
