@@ -18,14 +18,11 @@
 #include "Scene.h"
 #include "KdTree.h"
 
-//TODO: code verbessern, t/dist drübergehen
-// pointer to const retvals? for each const&?
-// % anzeige im fenster
+// TODO: pointer to const retvals? for each const&?
 
 const int MAX_DEPTH = 5;
 const int WIDTH = 600;
 const int HEIGHT = 600;
-const auto MAX_VALUE = std::numeric_limits<float>::max();
 const auto EPSILON = std::numeric_limits<float>::epsilon();
 const glm::vec3 BACKGROUND_COLOR(0.0f, 0.0f, 0.0f);
 
@@ -44,7 +41,7 @@ glm::vec3 raytrace(const Ray &ray, int depth, const std::vector<std::shared_ptr<
     }
 
     auto color = BACKGROUND_COLOR;
-    auto minDistance = MAX_VALUE;
+    auto minDistance = std::numeric_limits<float>::max();
 
     auto intersection = std::tuple<bool, float>{}; //TODO init?
     auto m = std::weak_ptr<Primitive>{};
@@ -116,7 +113,7 @@ std::tuple<bool, float> &intersection, const std::weak_ptr<Primitive> &prim) {
             auto lightDistance2 = dot(lightDirection, lightDirection);
             lightDirection = normalize(lightDirection);
             auto LdotN = std::max(dot(lightDirection, intersectionNormal), 0.0f);
-            auto tNearShadow = MAX_VALUE;
+            auto tNearShadow = lightDistance2;
 
             //TODO schöner
             bool inShadow = false;
@@ -124,8 +121,8 @@ std::tuple<bool, float> &intersection, const std::weak_ptr<Primitive> &prim) {
             if (!light->blocker.expired()) {
                 auto shadowIntersection = light->blocker.lock()->intersect(Ray{shadowPointOrigin, lightDirection}, tNearShadow);
                 tNearShadow = std::get<1>(shadowIntersection);
-                inShadow = std::get<0>(shadowIntersection) && tNearShadow * tNearShadow <
-                                                              lightDistance2; //TODO: nötig? vll tNearShadow = sqrt(lightDistance)
+                inShadow = std::get<0>(shadowIntersection)/* && tNearShadow * tNearShadow <
+                                                              lightDistance2*/; // currently not needed
             }
 
             if (!inShadow) {
@@ -133,8 +130,8 @@ std::tuple<bool, float> &intersection, const std::weak_ptr<Primitive> &prim) {
                     auto shadowIntersection = model->intersect(Ray{shadowPointOrigin, lightDirection},
                                                                tNearShadow);
                     tNearShadow = std::get<1>(shadowIntersection);
-                    inShadow = std::get<0>(shadowIntersection) && tNearShadow * tNearShadow <
-                                                                  lightDistance2; //TODO: nötig? vll tNearShadow = sqrt(lightDistance)
+                    inShadow = std::get<0>(shadowIntersection)/* && tNearShadow * tNearShadow <
+                                                                  lightDistance2*/;
                     if (inShadow) {
                         light->blocker = prim;
                         break;
@@ -177,6 +174,7 @@ void render(Window &window, const Camera &camera, const std::vector<std::shared_
 
             window.putPixel(x, y, color);
         }
+        window.setTitle(std::to_string(int(roundf((y+1)/float(HEIGHT)*100))) + "%");
     }
 }
 
@@ -201,7 +199,9 @@ int main() {
               << " ms\n";
 
     std::cout << "Intersections checked: " << counter << "\n";
+    window.setTitle(std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(t2-t1).count()) + " ms");
     window.render();
+
 
     return EXIT_SUCCESS;
 }

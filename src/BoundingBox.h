@@ -34,17 +34,30 @@ public:
             max{std::move(max)} {
     }
 
-    //TODO drüberschauen/optimieren
     bool intersect(const Ray &ray) const {
-        float tmin = (min.x - ray.getOrigin().x) / ray.getDirection().x;
-        float tmax = (max.x - ray.getOrigin().x) / ray.getDirection().x;
+        auto tmin = 0.0f;
+        auto tmax = 0.0f;
 
-        if (tmin > tmax) std::swap(tmin, tmax);
+        if (ray.getInverseDirection().x >= 0) {
+            tmin = (min.x - ray.getOrigin().x) * ray.getInverseDirection().x;
+            tmax = (max.x - ray.getOrigin().x) * ray.getInverseDirection().x;
+        }
+        else {
+            tmin = (max.x - ray.getOrigin().x) * ray.getInverseDirection().x;
+            tmax = (min.x - ray.getOrigin().x) * ray.getInverseDirection().x;
+        }
 
-        float tymin = (min.y - ray.getOrigin().y) / ray.getDirection().y;
-        float tymax = (max.y - ray.getOrigin().y) / ray.getDirection().y;
+        auto tymin = 0.0f;
+        auto tymax = 0.0f;
 
-        if (tymin > tymax) std::swap(tymin, tymax);
+        if (ray.getInverseDirection().y >= 0) {
+            tymin = (min.y - ray.getOrigin().y) * ray.getInverseDirection().y;
+            tymax = (max.y - ray.getOrigin().y) * ray.getInverseDirection().y;
+        }
+        else {
+            tymin = (max.y - ray.getOrigin().y) * ray.getInverseDirection().y;
+            tymax = (min.y - ray.getOrigin().y) * ray.getInverseDirection().y;
+        }
 
         if ((tmin > tymax) || (tymin > tmax))
             return false;
@@ -55,10 +68,17 @@ public:
         if (tymax < tmax)
             tmax = tymax;
 
-        float tzmin = (min.z - ray.getOrigin().z) / ray.getDirection().z;
-        float tzmax = (max.z - ray.getOrigin().z) / ray.getDirection().z;
+        auto tzmin = 0.0f;
+        auto tzmax = 0.0f;
 
-        if (tzmin > tzmax) std::swap(tzmin, tzmax);
+        if (ray.getInverseDirection().z >= 0) {
+            tzmin = (min.z - ray.getOrigin().z) * ray.getInverseDirection().z;
+            tzmax = (max.z - ray.getOrigin().z) * ray.getInverseDirection().z;
+        }
+        else {
+            tzmin = (max.z - ray.getOrigin().z) * ray.getInverseDirection().z;
+            tzmax = (min.z - ray.getOrigin().z) * ray.getInverseDirection().z;
+        }
 
         if ((tmin > tzmax) || (tzmin > tmax))
             return false;
@@ -69,7 +89,9 @@ public:
         if (tzmax < tmax)
             tmax = tzmax;
 
-        return true;
+        // ignore intersections behind the ray
+        return tmax >= 0.0f;
+//         return true;
     }
 
 private:

@@ -51,6 +51,10 @@ public:
         }
     }
 
+    void setTitle(const std::string title) {
+        SDL_SetWindowTitle(window.get(), title.data());
+    }
+
 private:
     SDL_Event event;
     std::unique_ptr<SDL_Window, SDL_Deleter> window;

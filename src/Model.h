@@ -88,7 +88,6 @@ private:
                 vertices[j] = vertex;
             }
             if(material) {
-                //TODO emplace_back?
                 primitives.push_back(std::make_shared<Triangle>(vertices, material));
             } else {
                 primitives.push_back(std::make_shared<Triangle>(vertices));
