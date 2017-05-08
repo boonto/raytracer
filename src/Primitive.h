@@ -13,6 +13,16 @@
 
 class Primitive {
 public:
+    struct IntersectionA {
+        bool result;
+        float t;
+    };
+
+    struct IntersectionB {
+        glm::vec3 position;
+        glm::vec3 normal;
+    };
+
     enum class Axis {
         x,
         y,
@@ -27,10 +37,9 @@ public:
     virtual ~Primitive() {
     }
 
-    //TODO einzelne funktion?
-    virtual std::tuple<bool, float> intersect(const Ray &ray, const float dist) const = 0; //TODO: schönerer retval?
+    virtual IntersectionA intersect(const Ray &ray, const float dist) const = 0; //TODO: schönerer retval?
 
-    virtual std::tuple<glm::vec3, glm::vec3> getIntersectionVectors(const Ray &ray, const float dist) const = 0;
+    virtual IntersectionB getIntersectionVectors(const Ray &ray, const float dist) const = 0;
 
     virtual std::tuple<glm::vec3, glm::vec3> getExtremes() const = 0;
 

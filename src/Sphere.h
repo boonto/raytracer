@@ -15,9 +15,9 @@ public:
             radius{radius} {
     }
 
-    std::tuple<bool, float> intersect(const Ray &ray, const float dist) const override;
+    IntersectionA intersect(const Ray &ray, const float dist) const override;
 
-    std::tuple<glm::vec3, glm::vec3> getIntersectionVectors(const Ray &ray, const float dist) const override;
+    IntersectionB getIntersectionVectors(const Ray &ray, const float dist) const override;
 
     std::tuple<glm::vec3, glm::vec3> getExtremes() const override;
 

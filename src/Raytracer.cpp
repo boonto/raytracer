@@ -22,7 +22,7 @@ unsigned int Raytracer::render(Window &window) {
     return counter;
 }
 
-glm::tvec3<float, 0> Raytracer::raytrace(const Ray &ray, const int depth) {
+glm::vec3 Raytracer::raytrace(const Ray &ray, const int depth) {
     if (depth > MAX_DEPTH) {
         return BACKGROUND_COLOR;
     }
@@ -51,8 +51,8 @@ glm::tvec3<float, 0> Raytracer::raytrace(const Ray &ray, const int depth) {
 
 glm::vec3 Raytracer::shade(const Ray &ray, const int depth, const float t, const std::weak_ptr<Primitive> &prim) {
     auto intersectionVectors = prim.lock()->getIntersectionVectors(ray, t);
-    auto intersectionPosition = std::get<0>(intersectionVectors);
-    auto intersectionNormal = std::get<1>(intersectionVectors);
+    auto intersectionPosition = intersectionVectors.position;
+    auto intersectionNormal = intersectionVectors.normal;
     auto color = glm::vec3(0.0f);
     auto material = prim.lock()->getMaterial();
 
@@ -76,15 +76,15 @@ glm::vec3 Raytracer::shade(const Ray &ray, const int depth, const float t, const
             if (!light->blocker.expired()) {
                 auto shadowIntersection = light->blocker.lock()->intersect(Ray{shadowPointOrigin, lightDirection}, tNearShadow);
                 // needed with tNearShadow = lightDistance2?
-                inShadow = std::get<0>(shadowIntersection)/* && tNearShadow * tNearShadow < lightDistance2*/;
+                inShadow = shadowIntersection.result/* && tNearShadow * tNearShadow < lightDistance2*/;
             }
 
             // TODO Kdtree nutzen
             if (!inShadow) {
                 for (auto const &model : scene->primitives) {
                     auto shadowIntersection = model->intersect(Ray{shadowPointOrigin, lightDirection}, tNearShadow);
-                    tNearShadow = std::get<1>(shadowIntersection);
-                    inShadow = std::get<0>(shadowIntersection)/* && tNearShadow * tNearShadow < lightDistance2*/;
+                    tNearShadow = shadowIntersection.t;
+                    inShadow = shadowIntersection.result/* && tNearShadow * tNearShadow < lightDistance2*/;
                     if (inShadow) {
                         light->blocker = prim;
                         break;
