@@ -6,7 +6,7 @@
 #include <glm/geometric.hpp>
 #include "Sphere.h"
 
-Primitive::IntersectionA Sphere::intersect(const Ray &ray, const float dist) const {
+Primitive::Intersection Sphere::intersect(const Ray &ray, const float dist) const {
     auto result = false;
     auto t = std::numeric_limits<float>::max();
 
@@ -34,14 +34,14 @@ Primitive::IntersectionA Sphere::intersect(const Ray &ray, const float dist) con
         }
     }
 
-    return IntersectionA{result, t};
+    return Intersection{result, t};
 }
 
-Primitive::IntersectionB Sphere::getIntersectionVectors(const Ray &ray, const float dist) const {
+Primitive::IntersectionVectors Sphere::getIntersectionVectors(const Ray &ray, const float dist) const {
     auto position = ray.getOrigin() + dist * ray.getDirection();
     auto normal = glm::normalize((position - origin) / radius);
 
-    return IntersectionB{position, normal};
+    return IntersectionVectors{position, normal};
 }
 
 std::tuple<glm::vec3, glm::vec3> Sphere::getExtremes() const {

@@ -21,9 +21,9 @@ public:
             vertices(std::move(vertices)) {
     }
 
-    IntersectionA intersect(const Ray &ray, const float dist) const override;
+    Intersection intersect(const Ray &ray, const float dist) const override;
 
-    IntersectionB getIntersectionVectors(const Ray &ray, const float dist) const override;
+    IntersectionVectors getIntersectionVectors(const Ray &ray, const float dist) const override;
 
     std::tuple<glm::vec3, glm::vec3> getExtremes() const override;
 

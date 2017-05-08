@@ -40,7 +40,7 @@ public:
     std::tuple<float, std::weak_ptr<Primitive>> intersect(const Ray &ray, unsigned int &counter) const {
         auto m = std::weak_ptr<Primitive>{};
         auto minDistance = std::numeric_limits<float>::max();
-        auto intersection = Primitive::IntersectionA{false, 0.0f};
+        auto intersection = Primitive::Intersection{false, 0.0f};
 
         auto node = std::make_shared<KdTreeNode>(root);
         auto stack = std::stack<std::shared_ptr<KdTreeNode>>{};

@@ -13,12 +13,12 @@
 
 class Primitive {
 public:
-    struct IntersectionA {
+    struct Intersection {
         bool result;
         float t;
     };
 
-    struct IntersectionB {
+    struct IntersectionVectors {
         glm::vec3 position;
         glm::vec3 normal;
     };
@@ -37,9 +37,9 @@ public:
     virtual ~Primitive() {
     }
 
-    virtual IntersectionA intersect(const Ray &ray, const float dist) const = 0; //TODO: schönerer retval?
+    virtual Intersection intersect(const Ray &ray, const float dist) const = 0;
 
-    virtual IntersectionB getIntersectionVectors(const Ray &ray, const float dist) const = 0;
+    virtual IntersectionVectors getIntersectionVectors(const Ray &ray, const float dist) const = 0;
 
     virtual std::tuple<glm::vec3, glm::vec3> getExtremes() const = 0;
 

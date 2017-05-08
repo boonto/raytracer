@@ -5,7 +5,7 @@
 #include <glm/glm.hpp>
 #include "Plane.h"
 
-Primitive::IntersectionA Plane::intersect(const Ray &ray, const float dist) const {
+Primitive::Intersection Plane::intersect(const Ray &ray, const float dist) const {
     auto result = false;
     auto t = std::numeric_limits<float>::max();
 
@@ -17,13 +17,13 @@ Primitive::IntersectionA Plane::intersect(const Ray &ray, const float dist) cons
         }
     }
 
-    return IntersectionA{result, t};
+    return Intersection{result, t};
 }
 
-Primitive::IntersectionB Plane::getIntersectionVectors(const Ray &ray, const float dist) const {
+Primitive::IntersectionVectors Plane::getIntersectionVectors(const Ray &ray, const float dist) const {
     auto position = ray.getOrigin() + dist * ray.getDirection();
 
-    return IntersectionB{position, normal};
+    return IntersectionVectors{position, normal};
 }
 
 std::tuple<glm::vec3, glm::vec3> Plane::getExtremes() const {
