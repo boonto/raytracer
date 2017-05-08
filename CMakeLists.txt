@@ -4,7 +4,7 @@ project(fast_raytracer)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Weffc++ -pedantic")
 set(CMAKE_CXX_STANDARD 14)
 
-set(SOURCE_FILES src/main.cpp src/Material.h src/Ray.h src/Model.h src/PointLight.h src/Plane.cpp src/Plane.h src/Sphere.cpp src/Sphere.h src/Camera.h src/Window.h src/Scene.h src/Mesh.h src/Triangle.h src/KdTree.h src/BoundingBox.h src/Primitive.h)
+set(SOURCE_FILES src/main.cpp src/Material.h src/Ray.h src/Model.h src/PointLight.h src/Plane.cpp src/Plane.h src/Sphere.cpp src/Sphere.h src/Camera.h src/Window.h src/Scene.h src/Mesh.h src/Triangle.h src/KdTree.h src/BoundingBox.h src/Primitive.h src/Raytracer.h src/Raytracer.cpp)
 include(FindPkgConfig)
 
 pkg_search_module(SDL2 REQUIRED sdl2)

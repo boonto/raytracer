@@ -33,14 +33,48 @@ public:
 
 class KdTree {
 public:
-    KdTree(std::vector<std::shared_ptr<Primitive>> primitives) :
+    KdTree(const std::vector<std::shared_ptr<Primitive>> primitives) :
             root(build(primitives, 0)) {
     }
 
+    std::tuple<float, std::weak_ptr<Primitive>> intersect(const Ray &ray, unsigned int &counter) const {
+        auto m = std::weak_ptr<Primitive>{};
+        auto minDistance = std::numeric_limits<float>::max();
+        auto intersection = std::tuple<bool, float>{false, minDistance};
+
+        auto node = std::make_shared<KdTreeNode>(root);
+        auto stack = std::stack<std::shared_ptr<KdTreeNode>>{};
+        stack.push(node);
+
+        while(!stack.empty()) {
+            node = stack.top();
+            stack.pop();
+            if (node->bbox) {
+                if (node->bbox->intersect(ray)) {
+                    if (node->rightChild) {
+                        stack.push(node->rightChild);
+                    }
+                    if (node->leftChild) {
+                        stack.push(node->leftChild);
+                    }
+                }
+            } else if (node->data) {
+                auto newIntersection = node->data->intersect(ray, minDistance);
+                if (std::get<0>(newIntersection)) {
+                    m = node->data;
+                    intersection = newIntersection;
+                    minDistance = std::get<1>(newIntersection);
+                }
+                counter++;
+            }
+        }
+
+        return std::make_tuple(std::get<1>(intersection), m);
+    }
+private:
     KdTreeNode root;
 
-private:
-    KdTreeNode build(std::vector<std::shared_ptr<Primitive>> primitives, int depth) {
+    KdTreeNode build(std::vector<std::shared_ptr<Primitive>> primitives, const int depth) {
         auto node = KdTreeNode{nullptr, nullptr, nullptr, nullptr};
 
         if (primitives.size() == 1) {
@@ -83,21 +117,6 @@ private:
         // median, not real median for even number of elements
         auto n = primitives.size() / 2;
         std::nth_element(primitives.begin(), primitives.begin()+n, primitives.end(), compare);
-//        auto extremes = primitives[n]->getExtremes();
-//        switch (axis) {
-//            case Primitive::Axis::x: {
-//                std::cout << "x " << std::get<1>(extremes).x << "\n";
-//                break;
-//            }
-//            case Primitive::Axis::y: {
-//                std::cout << "y " << std::get<1>(extremes).y << "\n";
-//                break;
-//            }
-//            case Primitive::Axis::z: {
-//                std::cout << "z " << std::get<1>(extremes).z << "\n";
-//                break;
-//            }
-//        }
 
         auto leftHalf = std::vector<std::shared_ptr<Primitive>>{primitives.begin(), primitives.begin() + n};
         auto rightHalf = std::vector<std::shared_ptr<Primitive>>{primitives.begin() + n, primitives.end()};

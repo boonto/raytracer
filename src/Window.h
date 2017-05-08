@@ -5,9 +5,10 @@
 #ifndef FAST_RAYTRACER_WINDOW_H
 #define FAST_RAYTRACER_WINDOW_H
 
-#include <SDL2/SDL.h>
-#include <glm/vec2.hpp>
 #include <memory>
+#include "SDL2/SDL.h"
+#include "glm/vec3.hpp"
+#include "glm/vec2.hpp"
 
 class Window {
     struct SDL_Deleter {
