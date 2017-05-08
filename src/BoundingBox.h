@@ -14,7 +14,7 @@ public:
             min{std::move(glm::vec3{std::numeric_limits<float>::max()})},
             max{std::move(glm::vec3{std::numeric_limits<float>::min()})} {
         
-        for (auto primitive : primitives) {
+        for (auto const& primitive : primitives) {
             auto extremes = primitive->getExtremes();
 
             auto primMin = std::get<0>(extremes);

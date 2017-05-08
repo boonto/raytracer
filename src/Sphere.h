@@ -9,14 +9,7 @@
 
 class Sphere : public Primitive {
 public:
-    // TODO irgendwie mit delegating ctor?
-    Sphere(const glm::vec3 origin, const float radius) :
-            Primitive{},
-            origin{std::move(origin)},
-            radius(radius) {
-    }
-
-    Sphere(const glm::vec3 origin, const float radius, const std::shared_ptr<Material> material) :
+    Sphere(const glm::vec3 origin, const float radius, const std::shared_ptr<Material> material = std::make_shared<Material>(Material{})) :
             Primitive{std::move(material)},
             origin{std::move(origin)},
             radius{radius} {

@@ -37,7 +37,7 @@ public:
     std::vector<std::shared_ptr<Primitive>> getPrimitives() {
         auto primitives = std::vector<std::shared_ptr<Primitive>>{};
 
-        for (auto mesh : meshes) {
+        for (auto const& mesh : meshes) {
             auto meshPrimitives = mesh->getPrimitives();
             primitives.insert(primitives.end(),
                               std::make_move_iterator(meshPrimitives.begin()),

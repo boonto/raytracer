@@ -14,7 +14,7 @@
 
 class Scene {
 public:
-    Scene(const glm::ivec2 resolution) :
+    Scene(const glm::uvec2 resolution) :
             camera{glm::vec3{-55.0f, 15.0f, 10.0f}, glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{0.0f, 0.0f, 0.0f}, std::move(resolution)},
             primitives{},
             lights{} {
@@ -82,13 +82,13 @@ public:
 //        auto triangle1 = Triangle{glm::vec3{5.0f, 5.0f, 5.0f}, glm::vec3{10.0f, 7.0f, 0.0f}, glm::vec3{5.0f, 5.0f, -5.0f}, redMaterial};
 //        primitives.push_back(std::make_shared<Triangle>(triangle1));
 
-//        for (unsigned int i = 0; i < 5; ++i) {
-//            for (unsigned int j = 0; j < 20; ++j) {
-//                for (unsigned int k = 0; k < 5; ++k) {
-//                    primitives.push_back(std::make_shared<Sphere>(Sphere{glm::vec3{-8.0f + i, 1.0f + j, -2.0f + k}, 0.4f}));
-//                }
-//            }
-//        }
+        for (unsigned int i = 0; i < 5; ++i) {
+            for (unsigned int j = 0; j < 10; ++j) {
+                for (unsigned int k = 0; k < 5; ++k) {
+                    primitives.push_back(std::make_shared<Sphere>(Sphere{glm::vec3{-8.0f + i, 1.0f + j, -2.0f + k}, 0.4f}));
+                }
+            }
+        }
 
         lights.push_back(std::make_shared<PointLight>(PointLight{glm::vec3{-5.0f, 30.0f, 0.0f}, glm::vec3{1.0f}, 0.5f}));
         lights.push_back(std::make_shared<PointLight>(PointLight{glm::vec3{-10.0f, 20.0f, 0.0f}, glm::vec3{1.0f}, 0.5f}));

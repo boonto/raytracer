@@ -11,25 +11,13 @@
 
 class Triangle : public Primitive {
 public:
-
-    //TODO ctors aufräumen
-    Triangle(const glm::vec3 p0, const glm::vec3 p1, const glm::vec3 p2) :
-            Primitive{},
-            vertices{p0, p1, p2} {
+    Triangle(const glm::vec3 p0, const glm::vec3 p1, const glm::vec3 p2, const std::shared_ptr<Material> material = std::make_shared<Material>(Material{})) :
+            Primitive{std::move(material)},
+            vertices{std::move(p0), std::move(p1), std::move(p2)} {
     }
 
-    Triangle(const glm::vec3 p0, const glm::vec3 p1, const glm::vec3 p2, const std::shared_ptr<Material> material) :
-            Primitive{material},
-            vertices{p0, p1, p2} {
-    }
-
-    Triangle(const std::array<glm::vec3, 3> vertices) :
-            Primitive{},
-            vertices(std::move(vertices)) {
-    }
-
-    Triangle(const std::array<glm::vec3, 3> vertices, const std::shared_ptr<Material> material) :
-            Primitive{material},
+    Triangle(const std::array<glm::vec3, 3> vertices, const std::shared_ptr<Material> material = std::make_shared<Material>(Material{})) :
+            Primitive{std::move(material)},
             vertices(std::move(vertices)) {
     }
 
@@ -104,7 +92,7 @@ public:
         auto minimum = glm::vec3{std::numeric_limits<float>::max()};
         auto maximum = glm::vec3{std::numeric_limits<float>::min()};
 
-        for (auto const vertex : vertices) {
+        for (auto const& vertex : vertices) {
             minimum.x = (vertex.x < minimum.x) ? vertex.x : minimum.x;
             minimum.y = (vertex.y < minimum.y) ? vertex.y : minimum.y;
             minimum.z = (vertex.z < minimum.z) ? vertex.z : minimum.z;

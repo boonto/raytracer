@@ -16,7 +16,7 @@ class Window {
     };
 
 public:
-    Window(const glm::ivec2 &resolution) :
+    Window(const glm::uvec2 resolution) :
             event{},
             window{nullptr},
             renderer{nullptr} {
