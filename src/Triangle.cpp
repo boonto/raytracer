@@ -94,7 +94,8 @@ Primitive::Extremes Triangle::getExtremes(Axis axis) const {
         case Axis::z: {
             return Extremes{minimum.z, maximum.z};
         }
-        default:
+        default: {
             return Extremes{0.0f, 0.0f};
+        }
     }
 }

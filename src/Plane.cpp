@@ -37,7 +37,8 @@ Primitive::Extremes Plane::getExtremes(Axis axis) const {
         case Axis::z: {
             return Extremes{origin.z - (1 - normal.z) * distance, origin.z + (1 - normal.z) * distance};
         }
-        default:
+        default: {
             return Extremes{0.0f, 0.0f};
+        }
     }
 }

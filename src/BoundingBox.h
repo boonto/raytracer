@@ -9,7 +9,7 @@
 
 class BoundingBox {
 public:
-    BoundingBox(std::vector<std::shared_ptr<Primitive>> primitives) : 
+    BoundingBox(const std::vector<std::shared_ptr<Primitive>> primitives) :
             min{std::move(glm::vec3{std::numeric_limits<float>::max()})},
             max{std::move(glm::vec3{std::numeric_limits<float>::min()})} {
         

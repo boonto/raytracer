@@ -55,7 +55,8 @@ Primitive::Extremes Sphere::getExtremes(Axis axis) const {
         case Axis::z: {
             return Extremes{origin.z - radius, origin.z + radius};
         }
-        default:
+        default: {
             return Extremes{0.0f, 0.0f};
+        }
     }
 }
