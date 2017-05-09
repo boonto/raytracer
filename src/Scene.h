@@ -91,7 +91,7 @@ public:
         }
 
         lights.push_back(std::make_shared<PointLight>(PointLight{glm::vec3{-5.0f, 30.0f, 0.0f}, glm::vec3{1.0f}, 0.5f}));
-        lights.push_back(std::make_shared<PointLight>(PointLight{glm::vec3{-10.0f, 20.0f, 0.0f}, glm::vec3{1.0f}, 0.5f}));
+        //lights.push_back(std::make_shared<PointLight>(PointLight{glm::vec3{-10.0f, 20.0f, 0.0f}, glm::vec3{1.0f}, 0.5f}));
     }
 
     Camera camera;

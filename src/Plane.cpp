@@ -26,8 +26,18 @@ Primitive::IntersectionVectors Plane::getIntersectionVectors(const Ray &ray, con
     return IntersectionVectors{position, normal};
 }
 
-std::tuple<glm::vec3, glm::vec3> Plane::getExtremes() const {
-    auto minimum = origin - (glm::vec3{1.0f} - normal) * distance;
-    auto maximum = origin + (glm::vec3{1.0f} - normal) * distance;
-    return std::make_tuple(minimum, maximum);
+Primitive::Extremes Plane::getExtremes(Axis axis) const {
+    switch (axis) {
+        case Axis::x: {
+            return Extremes{origin.x - (1 - normal.x) * distance, origin.x + (1 - normal.x) * distance};
+        }
+        case Axis::y: {
+            return Extremes{origin.y - (1 - normal.y) * distance, origin.y + (1 - normal.y) * distance};
+        }
+        case Axis::z: {
+            return Extremes{origin.z - (1 - normal.z) * distance, origin.z + (1 - normal.z) * distance};
+        }
+        default:
+            return Extremes{0.0f, 0.0f};
+    }
 }

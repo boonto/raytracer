@@ -25,7 +25,7 @@ public:
 
     IntersectionVectors getIntersectionVectors(const Ray &ray, const float dist) const override;
 
-    std::tuple<glm::vec3, glm::vec3> getExtremes() const override;
+    Extremes getExtremes(Axis axis) const override;
 
 private:
     std::array<glm::vec3, 3> vertices;

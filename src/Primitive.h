@@ -41,7 +41,12 @@ public:
 
     virtual IntersectionVectors getIntersectionVectors(const Ray &ray, const float dist) const = 0;
 
-    virtual std::tuple<glm::vec3, glm::vec3> getExtremes() const = 0;
+    struct Extremes {
+        float min;
+        float max;
+    };
+
+    virtual Extremes getExtremes(Axis axis) const = 0;
 
     std::shared_ptr<Material> getMaterial() const {
         return material;

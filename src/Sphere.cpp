@@ -44,8 +44,18 @@ Primitive::IntersectionVectors Sphere::getIntersectionVectors(const Ray &ray, co
     return IntersectionVectors{position, normal};
 }
 
-std::tuple<glm::vec3, glm::vec3> Sphere::getExtremes() const {
-    auto minimum = origin - radius;
-    auto maximum = origin + radius;
-    return std::make_tuple(minimum, maximum);
+Primitive::Extremes Sphere::getExtremes(Axis axis) const {
+    switch (axis) {
+        case Axis::x: {
+            return Extremes{origin.x - radius, origin.x + radius};
+        }
+        case Axis::y: {
+            return Extremes{origin.y - radius, origin.y + radius};
+        }
+        case Axis::z: {
+            return Extremes{origin.z - radius, origin.z + radius};
+        }
+        default:
+            return Extremes{0.0f, 0.0f};
+    }
 }

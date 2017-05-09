@@ -70,7 +70,7 @@ Primitive::IntersectionVectors Triangle::getIntersectionVectors(const Ray &ray, 
     return IntersectionVectors{glm::vec3{0.0f}, glm::vec3{0.0f}};
 }
 
-std::tuple<glm::vec3, glm::vec3> Triangle::getExtremes() const {
+Primitive::Extremes Triangle::getExtremes(Axis axis) const {
     auto minimum = glm::vec3{std::numeric_limits<float>::max()};
     auto maximum = glm::vec3{std::numeric_limits<float>::min()};
 
@@ -84,5 +84,17 @@ std::tuple<glm::vec3, glm::vec3> Triangle::getExtremes() const {
         maximum.z = (vertex.z > maximum.z) ? vertex.z : maximum.z;
     }
 
-    return std::make_tuple(minimum, maximum);
+    switch (axis) {
+        case Axis::x: {
+            return Extremes{minimum.x, maximum.x};
+        }
+        case Axis::y: {
+            return Extremes{minimum.y, maximum.y};
+        }
+        case Axis::z: {
+            return Extremes{minimum.z, maximum.z};
+        }
+        default:
+            return Extremes{0.0f, 0.0f};
+    }
 }

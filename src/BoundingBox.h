@@ -5,7 +5,6 @@
 #ifndef FAST_RAYTRACER_BOUNDINGBOX_H
 #define FAST_RAYTRACER_BOUNDINGBOX_H
 
-
 #include "Model.h"
 
 class BoundingBox {
@@ -15,17 +14,17 @@ public:
             max{std::move(glm::vec3{std::numeric_limits<float>::min()})} {
         
         for (auto const& primitive : primitives) {
-            auto extremes = primitive->getExtremes();
+            auto extremesX = primitive->getExtremes(Primitive::Axis::x);
+            auto extremesY = primitive->getExtremes(Primitive::Axis::y);
+            auto extremesZ = primitive->getExtremes(Primitive::Axis::z);
 
-            auto primMin = std::get<0>(extremes);
-            min.x = (primMin.x < min.x) ? primMin.x : min.x;
-            min.y = (primMin.y < min.y) ? primMin.y : min.y;
-            min.z = (primMin.z < min.z) ? primMin.z : min.z;
+            min.x = (extremesX.min < min.x) ? extremesX.min : min.x;
+            min.y = (extremesY.min < min.y) ? extremesY.min : min.y;
+            min.z = (extremesZ.min < min.z) ? extremesZ.min : min.z;
 
-            auto primMax = std::get<1>(extremes);
-            max.x = (primMax.x > max.x) ? primMax.x : max.x;
-            max.y = (primMax.y > max.y) ? primMax.y : max.y;
-            max.z = (primMax.z > max.z) ? primMax.z : max.z;
+            max.x = (extremesX.max > max.x) ? extremesX.max : max.x;
+            max.y = (extremesY.max > max.y) ? extremesY.max : max.y;
+            max.z = (extremesZ.max > max.z) ? extremesZ.max : max.z;
         }
     }
     

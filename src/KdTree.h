@@ -90,27 +90,10 @@ private:
 
         // comparator lambda TODO getExtremes bei jedem vergleich? simpler?
         auto compare = [&axis](std::shared_ptr<Primitive> a, std::shared_ptr<Primitive> b) {
-            auto extremesA = a->getExtremes();
-            auto extremesB = b->getExtremes();
-            auto positionA = 0.0f;
-            auto positionB = 0.0f;
-            switch (axis) {
-                case Primitive::Axis::x: {
-                    positionA = std::get<0>(extremesA).x + std::get<1>(extremesA).x;
-                    positionB = std::get<0>(extremesB).x + std::get<1>(extremesB).x;
-                    break;
-                }
-                case Primitive::Axis::y: {
-                    positionA = std::get<0>(extremesA).y + std::get<1>(extremesA).y;
-                    positionB = std::get<0>(extremesB).y + std::get<1>(extremesB).y;
-                    break;
-                }
-                case Primitive::Axis::z: {
-                    positionA = std::get<0>(extremesA).z + std::get<1>(extremesA).z;
-                    positionB = std::get<0>(extremesB).z + std::get<1>(extremesB).z;
-                    break;
-                }
-            }
+            auto extremesA = a->getExtremes(axis);
+            auto extremesB = b->getExtremes(axis);
+            auto positionA = extremesA.min + extremesA.max;
+            auto positionB = extremesB.min + extremesA.max;
             return positionA < positionB;
         };
 
