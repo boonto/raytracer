@@ -93,6 +93,14 @@ public:
 //         return true;
     }
 
+    glm::vec3 getMin() const {
+        return min;
+    }
+
+    glm::vec3 getMax() const {
+        return max;
+    }
+
 private:
     glm::vec3 min;
     glm::vec3 max;

@@ -51,17 +51,23 @@ public:
         auto plane = Plane{glm::vec3{0.0f, 0.0f, 0.0f}, glm::vec3{0.0f, 1.0f, 0.0f}, 100.0f, greenMaterial};
         primitives.push_back(std::make_shared<Plane>(plane));
 
-        auto sphere0 = Sphere{glm::vec3{6.0f, 6.0f, 8.0f}, 5.0f, redMaterial};
+        auto sphere0 = Sphere{glm::vec3{-6.0f, 4.0f, 0.0f}, 2.0f, redMaterial};
         primitives.push_back(std::make_shared<Sphere>(sphere0));
 
-        auto sphere1 = Sphere{glm::vec3{0.0f, 6.0f, -8.0f}, 5.0f, reflectiveMaterial};
+        auto sphere1 = Sphere{glm::vec3{-4.0f, -4.0f, 0.0f}, 2.0f, redMaterial};
         primitives.push_back(std::make_shared<Sphere>(sphere1));
 
-        auto sphere2 = Sphere{glm::vec3{-6.0f, 6.0f, 8.0f}, 5.0f};
+        auto sphere2 = Sphere{glm::vec3{4.0f, 2.0f, 0.0f}, 2.0f, redMaterial};
         primitives.push_back(std::make_shared<Sphere>(sphere2));
 
-        auto sphere3 = Sphere{glm::vec3{-12.0f, 6.0f, -8.0f}, 5.0f, redMaterial};
+        auto sphere3 = Sphere{glm::vec3{6.0f, 0.0f, 0.0f}, 2.0f, redMaterial};
         primitives.push_back(std::make_shared<Sphere>(sphere3));
+
+        auto sphere4 = Sphere{glm::vec3{8.0f, 8.0f, 0.0f}, 2.0f, redMaterial};
+        primitives.push_back(std::make_shared<Sphere>(sphere4));
+
+        auto sphere5 = Sphere{glm::vec3{10.0f, 10.0f, 0.0f}, 2.0f, redMaterial};
+        primitives.push_back(std::make_shared<Sphere>(sphere5));
 
 //        auto sphere0Pointer = std::make_shared<Sphere>(sphere0);
 //        auto sphere0Vector = std::vector<std::shared_ptr<Primitive>>{sphere0Pointer};

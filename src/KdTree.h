@@ -18,23 +18,25 @@
 class KdTreeNode {
 public:
     KdTreeNode(const std::shared_ptr<BoundingBox> bbox, const std::shared_ptr<KdTreeNode> leftChild,
-               const std::shared_ptr<KdTreeNode> rightChild, const std::shared_ptr<Primitive> data) :
+               const std::shared_ptr<KdTreeNode> rightChild, const std::vector<std::shared_ptr<Primitive>> data) :
             bbox{std::move(bbox)},
             leftChild{std::move(leftChild)},
             rightChild{std::move(rightChild)},
             data{std::move(data)} {
     }
 
+
     std::shared_ptr<BoundingBox> bbox;
     std::shared_ptr<KdTreeNode> leftChild;
     std::shared_ptr<KdTreeNode> rightChild;
-    std::shared_ptr<Primitive> data;
+    std::vector<std::shared_ptr<Primitive>> data;
 };
 
 class KdTree {
 public:
+    // TODO: schöner
     KdTree(const std::vector<std::shared_ptr<Primitive>> primitives) :
-            root(build(primitives, 0)) {
+            root(build(primitives, 0, BoundingBox{primitives}.getMin(), BoundingBox{primitives}.getMax())) {
     }
 
     std::tuple<float, std::weak_ptr<Primitive>> intersect(const Ray &ray, unsigned int &counter) const {
@@ -58,14 +60,16 @@ public:
                         stack.push(node->leftChild);
                     }
                 }
-            } else if (node->data) {
-                auto newIntersection = node->data->intersect(ray, minDistance);
-                if (newIntersection.result) {
-                    m = node->data;
-                    intersection = newIntersection;
-                    minDistance = intersection.t;
+            } else if (!node->data.empty()) {
+                for (auto const& primitive : node->data) {
+                    auto newIntersection = primitive->intersect(ray, minDistance);
+                    if (newIntersection.result) {
+                        m = primitive;
+                        intersection = newIntersection;
+                        minDistance = intersection.t;
+                    }
+                    counter++;
                 }
-                counter++;
             }
         }
 
@@ -74,17 +78,17 @@ public:
 private:
     KdTreeNode root;
 
-    KdTreeNode build(std::vector<std::shared_ptr<Primitive>> primitives, const int depth) {
-        auto node = KdTreeNode{nullptr, nullptr, nullptr, nullptr};
+    KdTreeNode build(std::vector<std::shared_ptr<Primitive>> primitives, const int depth, glm::vec3 min, glm::vec3 max) {
+        auto node = KdTreeNode{nullptr, nullptr, nullptr, std::vector<std::shared_ptr<Primitive>>{}};
 
-        if (primitives.size() == 1) {
-            node.data = primitives[0];
+        if (depth >= 5) {
+            node.data = primitives;
             return node;
         } else if (primitives.size() == 0) {
             return node;
         }
 
-        node.bbox = std::make_shared<BoundingBox>(BoundingBox{primitives});
+        node.bbox = std::make_shared<BoundingBox>(BoundingBox{min, max});
 
         auto axis = Primitive::Axis(depth % 3);
 
@@ -101,15 +105,40 @@ private:
         auto n = primitives.size() / 2;
         std::nth_element(primitives.begin(), primitives.begin()+n, primitives.end(), compare);
 
-        auto leftHalf = std::vector<std::shared_ptr<Primitive>>{primitives.begin(), primitives.begin() + n};
-        auto rightHalf = std::vector<std::shared_ptr<Primitive>>{primitives.begin() + n, primitives.end()};
+        //correctly split on axis TODO: better
+        auto splitPosition = primitives[n]->getExtremes(axis).min;
+        auto leftHalf = std::vector<std::shared_ptr<Primitive>>{};
+        auto rightHalf = std::vector<std::shared_ptr<Primitive>>{};
 
-        if (leftHalf.size() > 0) {
-            node.leftChild = std::make_shared<KdTreeNode>(build(leftHalf, depth + 1));
+        for (auto const& primitive : primitives) {
+            auto extremes = primitive->getExtremes(axis);
+            if (extremes.max <= splitPosition) {
+                leftHalf.push_back(primitive);
+            } else if (extremes.min >= splitPosition) {
+                rightHalf.push_back(primitive);
+            } else {
+                leftHalf.push_back(primitive);
+                rightHalf.push_back(primitive);
+            }
         }
 
+        auto splitVec = node.bbox->getMax();
+        switch (axis) {
+            case Primitive::Axis::x:splitVec.x = splitPosition; break;
+            case Primitive::Axis::y:splitVec.y = splitPosition; break;
+            case Primitive::Axis::z:splitVec.z = splitPosition; break;
+        }
+        if (leftHalf.size() > 0) {
+            node.leftChild = std::make_shared<KdTreeNode>(build(leftHalf, depth + 1, node.bbox->getMin(), splitVec));
+        }
+        splitVec = node.bbox->getMin();
+        switch (axis) {
+            case Primitive::Axis::x:splitVec.x = splitPosition; break;
+            case Primitive::Axis::y:splitVec.y = splitPosition; break;
+            case Primitive::Axis::z:splitVec.z = splitPosition; break;
+        }
         if (rightHalf.size() > 0) {
-            node.rightChild = std::make_shared<KdTreeNode>(build(rightHalf, depth + 1));
+            node.rightChild = std::make_shared<KdTreeNode>(build(rightHalf, depth + 1, splitVec, node.bbox->getMax()));
         }
 
         return node;
