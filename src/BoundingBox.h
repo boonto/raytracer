@@ -33,64 +33,50 @@ public:
             max{std::move(max)} {
     }
 
-    bool intersect(const Ray &ray) const {
-        auto tmin = 0.0f;
-        auto tmax = 0.0f;
+    struct Intersection {
+        bool result;
+        float tmin;
+        float tsplit;
+        float tmax;
+    };
 
-        if (ray.getInverseDirection().x >= 0) {
-            tmin = (min.x - ray.getOrigin().x) * ray.getInverseDirection().x;
-            tmax = (max.x - ray.getOrigin().x) * ray.getInverseDirection().x;
-        }
-        else {
-            tmin = (max.x - ray.getOrigin().x) * ray.getInverseDirection().x;
-            tmax = (min.x - ray.getOrigin().x) * ray.getInverseDirection().x;
-        }
+    //https://tavianator.com/fast-branchless-raybounding-box-intersections-part-2-nans/
+    Intersection intersect(const Ray &ray, const float splitLocation, const Primitive::Axis splitAxis) const {
+        auto tx1 = (min.x - ray.getOrigin().x) * ray.getInverseDirection().x;
+        auto tx2 = (max.x - ray.getOrigin().x) * ray.getInverseDirection().x;
 
-        auto tymin = 0.0f;
-        auto tymax = 0.0f;
+        auto tmin = std::min(tx1, tx2);
+        auto tmax = std::max(tx1, tx2);
 
-        if (ray.getInverseDirection().y >= 0) {
-            tymin = (min.y - ray.getOrigin().y) * ray.getInverseDirection().y;
-            tymax = (max.y - ray.getOrigin().y) * ray.getInverseDirection().y;
-        }
-        else {
-            tymin = (max.y - ray.getOrigin().y) * ray.getInverseDirection().y;
-            tymax = (min.y - ray.getOrigin().y) * ray.getInverseDirection().y;
-        }
+        auto ty1 = (min.y - ray.getOrigin().y) * ray.getInverseDirection().y;
+        auto ty2 = (max.y - ray.getOrigin().y) * ray.getInverseDirection().y;
 
-        if ((tmin > tymax) || (tymin > tmax))
-            return false;
+        tmin = std::max(tmin, std::min(std::min(ty1, ty2), tmax));
+        tmax = std::min(tmax, std::max(std::max(ty1, ty2), tmin));
 
-        if (tymin > tmin)
-            tmin = tymin;
+        auto tz1 = (min.z - ray.getOrigin().z) * ray.getInverseDirection().z;
+        auto tz2 = (max.z - ray.getOrigin().z) * ray.getInverseDirection().z;
 
-        if (tymax < tmax)
-            tmax = tymax;
+        tmin = std::max(tmin, std::min(std::min(tz1, tz2), tmax));
+        tmax = std::min(tmax, std::max(std::max(tz1, tz2), tmin));
 
-        auto tzmin = 0.0f;
-        auto tzmax = 0.0f;
-
-        if (ray.getInverseDirection().z >= 0) {
-            tzmin = (min.z - ray.getOrigin().z) * ray.getInverseDirection().z;
-            tzmax = (max.z - ray.getOrigin().z) * ray.getInverseDirection().z;
-        }
-        else {
-            tzmin = (max.z - ray.getOrigin().z) * ray.getInverseDirection().z;
-            tzmax = (min.z - ray.getOrigin().z) * ray.getInverseDirection().z;
+        auto tsplit = 0.0f;
+        switch (splitAxis) {
+            case Primitive::Axis::x: {
+                tsplit = (splitLocation - ray.getOrigin().x) * ray.getInverseDirection().x;
+                break;
+            }
+            case Primitive::Axis::y: {
+                tsplit = (splitLocation - ray.getOrigin().y) * ray.getInverseDirection().y;
+                break;
+            }
+            case Primitive::Axis::z: {
+                tsplit = (splitLocation - ray.getOrigin().z) * ray.getInverseDirection().z;
+                break;
+            }
         }
 
-        if ((tmin > tzmax) || (tzmin > tmax))
-            return false;
-
-        if (tzmin > tmin)
-            tmin = tzmin;
-
-        if (tzmax < tmax)
-            tmax = tzmax;
-
-        // ignore intersections behind the ray
-        return tmax >= 0.0f;
-//         return true;
+        return Intersection{tmax >= tmin && tmax > 0, tmin, tsplit, tmax};
     }
 
     glm::vec3 getMin() const {

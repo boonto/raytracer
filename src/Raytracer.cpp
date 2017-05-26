@@ -31,15 +31,15 @@ glm::vec3 Raytracer::raytrace(const Ray &ray, const int depth) {
     auto intersection = kdTree.intersect(ray, counter);
 
     // ohne kdtree
-    //    for (auto const& primitive : primitives) {
-    //        auto newIntersection = primitive->intersect(ray, minDistance);
-    //        if(std::get<0>(newIntersection)) {
-    //            m = primitive;
-    //            intersection = newIntersection;
-    //            minDistance = std::get<1>(newIntersection);
-    //        }
-    //        counter++;
-    //    }
+//    auto intersection = std::tuple<float, std::weak_ptr<Primitive>>{};
+//    std::get<0>(intersection) = std::numeric_limits<float>::max();
+//    for (auto const& primitive : scene->primitives) {
+//        auto newIntersection = primitive->intersect(ray, std::get<0>(intersection));
+//        if(newIntersection.result) {
+//            intersection = std::make_tuple(newIntersection.t, primitive);
+//        }
+//        counter++;
+//    }
 
     auto color = BACKGROUND_COLOR;
     if(!std::get<1>(intersection).expired()) {

@@ -22,14 +22,19 @@ public:
             bbox{std::move(bbox)},
             leftChild{std::move(leftChild)},
             rightChild{std::move(rightChild)},
-            data{std::move(data)} {
+            data{std::move(data)},
+            splitLocation{0.0f},
+            splitAxis{Primitive::Axis::x},
+            isLeaf(false) {
     }
-
 
     std::shared_ptr<BoundingBox> bbox;
     std::shared_ptr<KdTreeNode> leftChild;
     std::shared_ptr<KdTreeNode> rightChild;
     std::vector<std::shared_ptr<Primitive>> data;
+    float splitLocation;
+    Primitive::Axis splitAxis;
+    bool isLeaf;
 };
 
 class KdTree {
@@ -41,8 +46,7 @@ public:
 
     std::tuple<float, std::weak_ptr<Primitive>> intersect(const Ray &ray, unsigned int &counter) const {
         auto m = std::weak_ptr<Primitive>{};
-        auto minDistance = std::numeric_limits<float>::max();
-        auto intersection = Primitive::Intersection{false, 0.0f};
+        auto intersection = Primitive::Intersection{false, std::numeric_limits<float>::max()};
 
         auto node = std::make_shared<KdTreeNode>(root);
         auto stack = std::stack<std::shared_ptr<KdTreeNode>>{};
@@ -51,53 +55,84 @@ public:
         while(!stack.empty()) {
             node = stack.top();
             stack.pop();
-            if (node->bbox) {
-                if (node->bbox->intersect(ray)) {
-                    if (node->rightChild) {
-                        stack.push(node->rightChild);
-                    }
-                    if (node->leftChild) {
-                        stack.push(node->leftChild);
-                    }
-                }
-            } else if (!node->data.empty()) {
-                for (auto const& primitive : node->data) {
-                    auto newIntersection = primitive->intersect(ray, minDistance);
+            if (node->isLeaf) {
+                for (auto const &primitive : node->data) {
+                    auto newIntersection = primitive->intersect(ray, intersection.t);
                     if (newIntersection.result) {
                         m = primitive;
                         intersection = newIntersection;
-                        minDistance = intersection.t;
+                        //break; //geht
                     }
                     counter++;
                 }
+            } else {
+                auto intersectionBbox = node->bbox->intersect(ray, node->splitLocation, node->splitAxis);
+                if (intersectionBbox.result) {
+                    auto near = node->leftChild;
+                    auto far = node->rightChild;
+                    switch (node->splitAxis) {
+                        case Primitive::Axis::x:{
+                            near = (node->splitLocation > ray.getOrigin().x) ? node->leftChild : node->rightChild;
+                            far = (node->splitLocation > ray.getOrigin().x) ? node->rightChild : node->leftChild;
+                            break;
+                        }
+                        case Primitive::Axis::y:{
+                            near = (node->splitLocation > ray.getOrigin().y) ? node->leftChild : node->rightChild;
+                            far = (node->splitLocation > ray.getOrigin().y) ? node->rightChild : node->leftChild;
+                            break;
+                        }
+                        case Primitive::Axis::z:{
+                            near = (node->splitLocation > ray.getOrigin().z) ? node->leftChild : node->rightChild;
+                            far = (node->splitLocation > ray.getOrigin().z) ? node->rightChild : node->leftChild;
+                            break;
+                        }
+                    }
+
+                    if (intersectionBbox.tsplit >= intersectionBbox.tmax || intersectionBbox.tsplit < 0) {
+                        if(near)
+                        stack.push(near);
+                    } else if (intersectionBbox.tsplit <= intersectionBbox.tmin) {
+                        if(far)
+                        stack.push(far);
+                    } else {
+                        if(far)
+                        stack.push(far);
+                        if(near)
+                        stack.push(near);
+                    }
+                }
             }
         }
-
         return std::make_tuple(intersection.t, m);
     }
+
 private:
     KdTreeNode root;
 
     KdTreeNode build(std::vector<std::shared_ptr<Primitive>> primitives, const int depth, glm::vec3 min, glm::vec3 max) {
         auto node = KdTreeNode{nullptr, nullptr, nullptr, std::vector<std::shared_ptr<Primitive>>{}};
 
-        if (depth >= 5) {
+        if (depth >= 5 || primitives.size() == 1) {
+            node.isLeaf = true;
             node.data = primitives;
             return node;
         } else if (primitives.size() == 0) {
+            node.isLeaf = true;
             return node;
         }
 
         node.bbox = std::make_shared<BoundingBox>(BoundingBox{min, max});
+        std::cout << glm::to_string(min) << " " << glm::to_string(max) << "\n";
 
         auto axis = Primitive::Axis(depth % 3);
+        node.splitAxis = axis;
 
         // comparator lambda TODO getExtremes bei jedem vergleich? simpler?
         auto compare = [&axis](std::shared_ptr<Primitive> a, std::shared_ptr<Primitive> b) {
             auto extremesA = a->getExtremes(axis);
             auto extremesB = b->getExtremes(axis);
             auto positionA = extremesA.min + extremesA.max;
-            auto positionB = extremesB.min + extremesA.max;
+            auto positionB = extremesB.min + extremesB.max;
             return positionA < positionB;
         };
 
@@ -107,6 +142,7 @@ private:
 
         //correctly split on axis TODO: better
         auto splitPosition = primitives[n]->getExtremes(axis).min;
+        node.splitLocation = splitPosition;
         auto leftHalf = std::vector<std::shared_ptr<Primitive>>{};
         auto rightHalf = std::vector<std::shared_ptr<Primitive>>{};
 
@@ -124,18 +160,18 @@ private:
 
         auto splitVec = node.bbox->getMax();
         switch (axis) {
-            case Primitive::Axis::x:splitVec.x = splitPosition; break;
-            case Primitive::Axis::y:splitVec.y = splitPosition; break;
-            case Primitive::Axis::z:splitVec.z = splitPosition; break;
+            case Primitive::Axis::x: splitVec.x = splitPosition; break;
+            case Primitive::Axis::y: splitVec.y = splitPosition; break;
+            case Primitive::Axis::z: splitVec.z = splitPosition; break;
         }
         if (leftHalf.size() > 0) {
             node.leftChild = std::make_shared<KdTreeNode>(build(leftHalf, depth + 1, node.bbox->getMin(), splitVec));
         }
         splitVec = node.bbox->getMin();
         switch (axis) {
-            case Primitive::Axis::x:splitVec.x = splitPosition; break;
-            case Primitive::Axis::y:splitVec.y = splitPosition; break;
-            case Primitive::Axis::z:splitVec.z = splitPosition; break;
+            case Primitive::Axis::x: splitVec.x = splitPosition; break;
+            case Primitive::Axis::y: splitVec.y = splitPosition; break;
+            case Primitive::Axis::z: splitVec.z = splitPosition; break;
         }
         if (rightHalf.size() > 0) {
             node.rightChild = std::make_shared<KdTreeNode>(build(rightHalf, depth + 1, splitVec, node.bbox->getMax()));
