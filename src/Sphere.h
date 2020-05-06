@@ -9,15 +9,16 @@
 
 class Sphere : public Primitive {
 public:
-    Sphere(const glm::vec3 origin, const float radius, const std::shared_ptr<Material> material = std::make_shared<Material>(Material{})) :
-            Primitive{std::move(material)},
-            origin{std::move(origin)},
+    Sphere(const glm::vec3 origin, const float radius,
+           const std::shared_ptr<Material>& material = std::make_shared<Material>(Material{})) :
+            Primitive{material},
+            origin{origin},
             radius{radius} {
     }
 
-    Intersection intersect(const Ray &ray, const float dist) const override;
+    Intersection intersect(const Ray &ray, float dist) const override;
 
-    IntersectionVectors getIntersectionVectors(const Ray &ray, const float dist) const override;
+    IntersectionVectors getIntersectionVectors(const Ray &ray, float dist) const override;
 
     Extremes getExtremes(Axis axis) const override;
 

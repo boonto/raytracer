@@ -9,11 +9,11 @@
 
 class BoundingBox {
 public:
-    BoundingBox(const std::vector<std::shared_ptr<Primitive>> primitives) :
-            min{std::move(glm::vec3{std::numeric_limits<float>::max()})},
-            max{std::move(glm::vec3{std::numeric_limits<float>::min()})} {
-        
-        for (auto const& primitive : primitives) {
+    explicit BoundingBox(const std::vector<std::shared_ptr<Primitive>>& primitives) :
+            min{glm::vec3{std::numeric_limits<float>::max()}},
+            max{glm::vec3{std::numeric_limits<float>::min()}} {
+
+        for (auto const &primitive : primitives) {
             auto extremesX = primitive->getExtremes(Primitive::Axis::x);
             auto extremesY = primitive->getExtremes(Primitive::Axis::y);
             auto extremesZ = primitive->getExtremes(Primitive::Axis::z);
@@ -27,10 +27,10 @@ public:
             max.z = (extremesZ.max > max.z) ? extremesZ.max : max.z;
         }
     }
-    
+
     BoundingBox(const glm::vec3 min, const glm::vec3 max) :
-            min{std::move(min)},
-            max{std::move(max)} {
+            min{min},
+            max{max} {
     }
 
     struct Intersection {

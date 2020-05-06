@@ -11,21 +11,22 @@ class Plane : public Primitive {
 public:
     Plane(const glm::vec3 origin, const glm::vec3 normal, const float distance) :
             Primitive{},
-            origin{std::move(origin)},
-            normal{std::move(normal)},
+            origin{origin},
+            normal{normal},
             distance(distance) {
     }
 
-    Plane(const glm::vec3 origin, const glm::vec3 normal, const float distance, const std::shared_ptr<Material> material) :
-            Primitive{std::move(material)},
-            origin{std::move(origin)},
-            normal{std::move(normal)},
+    Plane(const glm::vec3 origin, const glm::vec3 normal, const float distance,
+          const std::shared_ptr<Material>& material) :
+            Primitive{material},
+            origin{origin},
+            normal{normal},
             distance(distance) {
     }
 
-    Intersection intersect(const Ray &ray, const float dist) const override;
+    Intersection intersect(const Ray &ray, float dist) const override;
 
-    IntersectionVectors getIntersectionVectors(const Ray &ray, const float dist) const override;
+    IntersectionVectors getIntersectionVectors(const Ray &ray, float dist) const override;
 
     Extremes getExtremes(Axis axis) const override;
 

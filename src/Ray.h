@@ -10,20 +10,20 @@
 class Ray {
 public:
     Ray(const glm::vec3 origin, const glm::vec3 direction) :
-            origin{std::move(origin)},
-            direction{std::move(direction)},
-            invDir{glm::vec3{1.0f} / direction}{
+            origin{origin},
+            direction{direction},
+            invDir{glm::vec3{1.0f} / direction} {
     }
 
-    const glm::vec3 getOrigin() const {
+    glm::vec3 getOrigin() const {
         return origin;
     }
 
-    const glm::vec3 getDirection() const {
+    glm::vec3 getDirection() const {
         return direction;
     }
 
-    const glm::vec3 getInverseDirection() const {
+    glm::vec3 getInverseDirection() const {
         return invDir;
     }
 

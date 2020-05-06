@@ -11,7 +11,7 @@ Primitive::Intersection Triangle::intersect(const Ray &ray, const float dist) co
     auto P = glm::cross(ray.getDirection(), edge1);
 
     auto det = glm::dot(edge0, P);
-    if(abs(det) < std::numeric_limits<float>::epsilon())
+    if (abs(det) < std::numeric_limits<float>::epsilon())
         return Intersection{false, 0};
 
     auto invDet = 1.0f / det;
@@ -43,7 +43,7 @@ Primitive::IntersectionVectors Triangle::getIntersectionVectors(const Ray &ray, 
     auto P = glm::cross(ray.getDirection(), edge1);
 
     auto det = glm::dot(edge0, P);
-    if(abs(det) < std::numeric_limits<float>::epsilon())
+    if (abs(det) < std::numeric_limits<float>::epsilon())
         return IntersectionVectors{glm::vec3{0.0f}, glm::vec3{0.0f}};
 
     auto invDet = 1.0f / det;
@@ -74,7 +74,7 @@ Primitive::Extremes Triangle::getExtremes(Axis axis) const {
     auto minimum = glm::vec3{std::numeric_limits<float>::max()};
     auto maximum = glm::vec3{std::numeric_limits<float>::min()};
 
-    for (auto const& vertex : vertices) {
+    for (auto const &vertex : vertices) {
         minimum.x = (vertex.x < minimum.x) ? vertex.x : minimum.x;
         minimum.y = (vertex.y < minimum.y) ? vertex.y : minimum.y;
         minimum.z = (vertex.z < minimum.z) ? vertex.z : minimum.z;

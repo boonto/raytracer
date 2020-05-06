@@ -14,90 +14,98 @@
 
 class Scene {
 public:
-    Scene(const glm::uvec2 resolution) :
-            camera{glm::vec3{-55.0f, 15.0f, 10.0f}, glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{0.0f, 0.0f, 0.0f}, std::move(resolution)},
+    explicit Scene(const glm::uvec2 resolution) :
+            camera{glm::vec3{0.0f, 7.0f, 22.0f}, glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{0.0f, 6.0f, 0.0f},
+//            camera{glm::vec3{230.0f, 60.0f, 450.0f}, glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{50.0f, -50.0f, 0.0f},
+                   resolution},
             primitives{},
             lights{} {
-        auto greenMaterial = std::make_shared<Material>(Material{glm::vec3{0.5f, 1.0f, 0.5f},
-                                      0.0f,
-                                      1.0f,
-                                      0.0f,
-                                      0.0f,
-                                      0.0f,
-                                      100,
-                                      1.2f
+        auto whiteMaterial = std::make_shared<Material>(Material{glm::vec3{1.0f, 1.0f, 1.0f},
+                                                                 0.0f,
+                                                                 1.0f,
+                                                                 0.0f,
+                                                                 0.0f,
+                                                                 0.0f,
+                                                                 100,
+                                                                 1.0f
         });
 
-        auto reflectiveMaterial = std::make_shared<Material>(Material{glm::vec3{1.0f, 0.0f, 0.0f},
-                                       0.0f,
-                                       0.0f,
-                                       0.0f,
-                                       1.0f,
-                                       0.0f,
-                                       90,
-                                       1.1f
+        auto greenMaterial = std::make_shared<Material>(Material{glm::vec3{0.5f, 1.0f, 0.5f},
+                                                                 0.0f,
+                                                                 1.0f,
+                                                                 0.0f,
+                                                                 0.0f,
+                                                                 0.0f,
+                                                                 100,
+                                                                 1.0f
+        });
+
+        auto reflectiveMaterial = std::make_shared<Material>(Material{glm::vec3{1.0f, 1.0f, 1.0f},
+                                                                      0.1f,
+                                                                      0.0f,
+                                                                      0.0f,
+                                                                      1.0f,
+                                                                      0.0f,
+                                                                      100,
+                                                                      1.0f
+        });
+
+        auto glassMaterial = std::make_shared<Material>(Material{glm::vec3{0.1f, 0.1f, 0.1f},
+                                                                 0.0f,
+                                                                 1.0f,
+                                                                 0.0f,
+                                                                 0.0f,
+                                                                 1.0f,
+                                                                 100,
+                                                                 1.5f
         });
 
         auto redMaterial = std::make_shared<Material>(Material{glm::vec3{1.0f, 0.5f, 0.5f},
-                                     0.0f,
-                                     1.0f,
-                                     0.0f,
-                                     0.0f,
-                                     0.0f,
-                                     100,
-                                     1.0f
+                                                               0.0f,
+                                                               1.0f,
+                                                               0.0f,
+                                                               0.0f,
+                                                               0.0f,
+                                                               100,
+                                                               1.0f
         });
 
-        auto plane = Plane{glm::vec3{0.0f, 0.0f, 0.0f}, glm::vec3{0.0f, 1.0f, 0.0f}, 100.0f, greenMaterial};
-        primitives.push_back(std::make_shared<Plane>(plane));
+        auto floor = Plane{glm::vec3{0.0f, 0.0f, 0.0f}, glm::vec3{0.0f, 1.0f, 0.0f}, 100.0f, whiteMaterial};
+        primitives.push_back(std::make_shared<Plane>(floor));
+        auto leftWall = Plane{glm::vec3{-10.0f, 0.0f, 0.0f}, glm::vec3{1.0f, 0.0f, 0.0f}, 100.0f, redMaterial};
+        primitives.push_back(std::make_shared<Plane>(leftWall));
+        auto rightWall = Plane{glm::vec3{10.0f, 0.0f, 0.0f}, glm::vec3{-1.0f, 0.0f, 0.0f}, 100.0f, greenMaterial};
+        primitives.push_back(std::make_shared<Plane>(rightWall));
+        auto backWall = Plane{glm::vec3{0.0f, 0.0f, -10.0f}, glm::vec3{0.0f, 0.0f, 1.0f}, 100.0f, whiteMaterial};
+        primitives.push_back(std::make_shared<Plane>(backWall));
+        auto frontWall = Plane{glm::vec3{0.0f, 0.0f, 23.0f}, glm::vec3{0.0f, 0.0f, -1.0f}, 100.0f, whiteMaterial};
+        primitives.push_back(std::make_shared<Plane>(backWall));
+        auto ceiling = Plane{glm::vec3{0.0f, 14.0f, 0.0f}, glm::vec3{0.0f, -1.0f, 0.0f}, 100.0f, whiteMaterial};
+        primitives.push_back(std::make_shared<Plane>(ceiling));
 
-        auto sphere0 = Sphere{glm::vec3{-6.0f, 4.0f, 0.0f}, 2.0f, redMaterial};
+        auto sphere0 = Sphere{glm::vec3{-7.0f, 4.0f, -4.0f}, 3.0f, reflectiveMaterial};
         primitives.push_back(std::make_shared<Sphere>(sphere0));
-
-        auto sphere1 = Sphere{glm::vec3{-4.0f, -4.0f, 0.0f}, 2.0f, redMaterial};
+        auto sphere1 = Sphere{glm::vec3{0.0f, 3.0f, -2.0f}, 2.0f, whiteMaterial};
         primitives.push_back(std::make_shared<Sphere>(sphere1));
-
-        auto sphere2 = Sphere{glm::vec3{4.0f, 2.0f, 0.0f}, 2.0f, redMaterial};
+        auto sphere2 = Sphere{glm::vec3{7.0f, 2.0f, 0.0f}, 1.0f, glassMaterial};
         primitives.push_back(std::make_shared<Sphere>(sphere2));
 
-        auto sphere3 = Sphere{glm::vec3{6.0f, 0.0f, 0.0f}, 2.0f, redMaterial};
-        primitives.push_back(std::make_shared<Sphere>(sphere3));
-
-        auto sphere4 = Sphere{glm::vec3{8.0f, 8.0f, 0.0f}, 2.0f, redMaterial};
-        primitives.push_back(std::make_shared<Sphere>(sphere4));
-
-        auto sphere5 = Sphere{glm::vec3{10.0f, 10.0f, 0.0f}, 2.0f, redMaterial};
-        primitives.push_back(std::make_shared<Sphere>(sphere5));
-
-//        auto sphere0Pointer = std::make_shared<Sphere>(sphere0);
-//        auto sphere0Vector = std::vector<std::shared_ptr<Primitive>>{sphere0Pointer};
-//        auto sphere0Mesh = Mesh{sphere0Vector};
-//        auto sphere0MeshPointer = std::make_shared<Mesh>(sphere0Mesh);
-//        auto sphere0MeshVector = std::vector<std::shared_ptr<Mesh>>{sphere0MeshPointer};
-//        auto SphereModel = Model{glm::vec3{0.0f}, sphere0MeshVector};
-
-//        auto airplane = Model{glm::vec3{0.0f, 2.0f, 0.0f}, std::string{"../cessna.obj"}};
-//        for (auto triangle : airplane.getPrimitives()) {
-//            primitives.push_back(triangle);
-//        }
-
-//        //TODO rauschen auf reflektion ansehen
-//        auto triangle0 = Triangle{glm::vec3{5.0f, 0.0f, 0.0f}, glm::vec3{5.0f, 5.0f, 5.0f}, glm::vec3{5.0f, 5.0f, -5.0f}, reflectiveMaterial};
-//        primitives.push_back(std::make_shared<Triangle>(triangle0));
-//
-//        auto triangle1 = Triangle{glm::vec3{5.0f, 5.0f, 5.0f}, glm::vec3{10.0f, 7.0f, 0.0f}, glm::vec3{5.0f, 5.0f, -5.0f}, redMaterial};
-//        primitives.push_back(std::make_shared<Triangle>(triangle1));
-
-        for (unsigned int i = 0; i < 5; ++i) {
-            for (unsigned int j = 0; j < 10; ++j) {
-                for (unsigned int k = 0; k < 5; ++k) {
-                    primitives.push_back(std::make_shared<Sphere>(Sphere{glm::vec3{-8.0f + i, 1.0f + j, -2.0f + k}, 0.4f}));
-                }
+        for (int i = -3; i <= 3; ++i) {
+            for (int j = -3; j <= 3; ++j) {
+                lights.push_back(std::make_shared<PointLight>(
+                        PointLight{glm::vec3{0.2f * (float) i, 13.99f, 0.2f * (float) j}, glm::vec3{1.0f}, 0.8f / 49}));
             }
         }
 
-        lights.push_back(std::make_shared<PointLight>(PointLight{glm::vec3{-5.0f, 30.0f, 0.0f}, glm::vec3{1.0f}, 0.5f}));
-        //lights.push_back(std::make_shared<PointLight>(PointLight{glm::vec3{-10.0f, 20.0f, 0.0f}, glm::vec3{1.0f}, 0.5f}));
+//        auto house = Model{glm::vec3{0.0f, 4.0f, 0.0f}, std::string{"../baltrams_warenhaus.glb"}, whiteMaterial};
+//        for (auto triangle : house.getPrimitives()) {
+//            primitives.push_back(triangle);
+//        }
+//
+//        lights.push_back(std::make_shared<PointLight>(PointLight{glm::vec3{200.0f, 100.0f, 400.0f}, glm::vec3{1.0f}, 0.20f}));
+//        lights.push_back(std::make_shared<PointLight>(PointLight{glm::vec3{210.0f, 110.0f, 410.0f}, glm::vec3{1.0f}, 0.20f}));
+//        lights.push_back(std::make_shared<PointLight>(PointLight{glm::vec3{220.0f, 120.0f, 420.0f}, glm::vec3{1.0f}, 0.20f}));
+//        lights.push_back(std::make_shared<PointLight>(PointLight{glm::vec3{230.0f, 130.0f, 430.0f}, glm::vec3{1.0f}, 0.20f}));
     }
 
     Camera camera;

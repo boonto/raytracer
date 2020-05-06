@@ -17,26 +17,30 @@
 #include "Scene.h"
 
 const glm::vec3 BACKGROUND_COLOR(0.0f, 0.0f, 0.0f);
-const int MAX_DEPTH = 5;
+const int MAX_DEPTH = 100;
+const bool USE_KDTREE = true;
 
 class Raytracer {
 public:
-    Raytracer(const std::shared_ptr<Scene> scene) :
+    explicit Raytracer(const std::shared_ptr<Scene>& scene) :
             scene{scene},
             kdTree{scene->primitives},
             counter{0} {
     }
 
-    unsigned int render(Window &window);
+    unsigned long long render(Window &window);
 
 private:
     std::shared_ptr<Scene> scene;
     KdTree kdTree;
-    unsigned int counter;
+    unsigned long long counter;
 
-    glm::vec3 raytrace(const Ray &ray, const int depth);
+    glm::vec3 raytrace(const Ray &ray, int depth);
 
-    glm::vec3 shade(const Ray &ray, const int depth, const float t, const std::weak_ptr<Primitive> &prim);
+    glm::vec3 shade(const Ray &ray, int depth, float t, const std::weak_ptr<Primitive> &prim);
+
+    static glm::vec3 refract(const glm::vec3 &intersectionDirection, const glm::vec3 &intersectionNormal, const float &refrIndex);
+    static float fresnel(const glm::vec3 &intersectionDirection, const glm::vec3 &intersectionNormal, const float &refrIndex);
 };
 
 #endif //FAST_RAYTRACER_RAYTRACER_H

@@ -17,8 +17,8 @@ public:
     std::weak_ptr<Primitive> blocker;
 
     PointLight(const glm::vec3 origin, const glm::vec3 color, const float intensity) :
-            origin{std::move(origin)},
-            color{std::move(color)},
+            origin{origin},
+            color{color},
             intensity{intensity},
             blocker{} {
     }

@@ -11,19 +11,21 @@
 
 class Triangle : public Primitive {
 public:
-    Triangle(const glm::vec3 p0, const glm::vec3 p1, const glm::vec3 p2, const std::shared_ptr<Material> material = std::make_shared<Material>(Material{})) :
-            Primitive{std::move(material)},
-            vertices{std::move(p0), std::move(p1), std::move(p2)} {
+    Triangle(const glm::vec3 p0, const glm::vec3 p1, const glm::vec3 p2,
+             const std::shared_ptr<Material>& material = std::make_shared<Material>(Material{})) :
+            Primitive{material},
+            vertices{p0, p1, p2} {
     }
 
-    Triangle(const std::array<glm::vec3, 3> vertices, const std::shared_ptr<Material> material = std::make_shared<Material>(Material{})) :
-            Primitive{std::move(material)},
-            vertices(std::move(vertices)) {
+    explicit Triangle(const std::array<glm::vec3, 3> vertices,
+             const std::shared_ptr<Material>& material = std::make_shared<Material>(Material{})) :
+            Primitive{material},
+            vertices(vertices) {
     }
 
-    Intersection intersect(const Ray &ray, const float dist) const override;
+    Intersection intersect(const Ray &ray, float dist) const override;
 
-    IntersectionVectors getIntersectionVectors(const Ray &ray, const float dist) const override;
+    IntersectionVectors getIntersectionVectors(const Ray &ray, float dist) const override;
 
     Extremes getExtremes(Axis axis) const override;
 

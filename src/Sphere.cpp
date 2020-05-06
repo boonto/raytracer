@@ -14,7 +14,7 @@ Primitive::Intersection Sphere::intersect(const Ray &ray, const float dist) cons
     auto b = -glm::dot(v, ray.getDirection());
     auto det = (b * b) - glm::dot(v, v) + powf(radius, 2.0f);
 
-    if(det > 0.0f) {
+    if (det > 0.0f) {
         det = sqrtf(det);
         auto t0 = b - det;
         auto t1 = b + det;

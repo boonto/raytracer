@@ -7,6 +7,7 @@
 
 #include <tuple>
 #include <memory>
+#include <utility>
 #include "glm/vec3.hpp"
 #include "Ray.h"
 #include "Material.h"
@@ -29,7 +30,7 @@ public:
         z
     };
 
-    Primitive(const std::shared_ptr<Material> material = std::make_shared<Material>(Material{})) :
+    explicit Primitive(std::shared_ptr<Material>  material = std::make_shared<Material>(Material{})) :
             material{std::move(material)} {
     }
 
@@ -37,9 +38,9 @@ public:
     virtual ~Primitive() {
     }
 
-    virtual Intersection intersect(const Ray &ray, const float dist) const = 0;
+    virtual Intersection intersect(const Ray &ray, float dist) const = 0;
 
-    virtual IntersectionVectors getIntersectionVectors(const Ray &ray, const float dist) const = 0;
+    virtual IntersectionVectors getIntersectionVectors(const Ray &ray, float dist) const = 0;
 
     struct Extremes {
         float min;

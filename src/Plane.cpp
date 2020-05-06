@@ -10,8 +10,8 @@ Primitive::Intersection Plane::intersect(const Ray &ray, const float dist) const
     auto t = std::numeric_limits<float>::max();
 
     auto denom = glm::dot(normal, ray.getDirection());
-    if(abs(denom) > std::numeric_limits<float>::epsilon()) {
-        t  = glm::dot((origin - ray.getOrigin()), normal) / denom;
+    if (abs(denom) > std::numeric_limits<float>::epsilon()) {
+        t = glm::dot((origin - ray.getOrigin()), normal) / denom;
         if (t > 0.0f && t < dist) {
             result = true;
         }
